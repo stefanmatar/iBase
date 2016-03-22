@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="iBase.OfflineView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:iBase"
+        mc:Ignorable="d"
+        Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+        </TextBlock>
+        <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Path=K_Bez}"></TextBlock>
+                        <TextBlock Text="{Binding Path=K_L_Klavst}"></TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <ListBox x:Name="MiddleListBoxName" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}" DisplayMemberPath="S_Name" Grid.RowSpan="2">
+        </ListBox>
+        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" Margin="3" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
+            <TextBlock Text="{Binding Path=Artist_Name}"/>
+            <TextBlock Text="{Binding Path=Album_Name}"/>
+            <TextBlock Text="{Binding Path=Track_Name}"/>
+            <Button x:Name="SaveClick" Content="Save" Click="SaveButtonName_Click"/>
+            <Button x:Name="NewClick" Content="Create new" Click="NewClick_Click"/>
+            <Button x:Name="DeleteClick" Content="Delete" Click="DeleteClick_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
