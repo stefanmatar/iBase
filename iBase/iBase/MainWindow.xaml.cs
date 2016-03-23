@@ -26,16 +26,16 @@ namespace iBase
         }
         private void OnlineMenuItemClick(object sender, RoutedEventArgs e)
         {
-            contentctl.Children.Clear();
+            MainWindowSpace.Children.Clear();
             var nc = new OnlineView();
-            contentctl.Children.Add(nc);
+            MainWindowSpace.Children.Add(nc);
         }
 
         private void OfflineMenuItemClick(object sender, RoutedEventArgs e)
         {
-            contentctl.Children.Clear();
+            MainWindowSpace.Children.Clear();
             var nc = new OfflineView();
-            contentctl.Children.Add(nc);
+            MainWindowSpace.Children.Add(nc);
         }
     }
 }

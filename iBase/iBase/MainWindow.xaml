@@ -5,12 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        ResizeMode="NoResize"
+        Title="MainWindow" Height="350" Width="500">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Offline" Click="OnlineMenuItemClick"/>
-            <MenuItem Header="Online" Click="OfflineMenuItemClick"/>
+            <MenuItem Header="Online" Click="OnlineMenuItemClick"/>
+            <MenuItem Header="Offline" Click="OfflineMenuItemClick"/>
         </Menu>
-        <Grid x:Name="contentctl" />
+        <Grid x:Name="MainWindowSpace" />
     </DockPanel>
 </Window>

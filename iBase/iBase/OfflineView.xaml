@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
         Height="300" Width="300">
+    <!-- Height and width will be deleted later on! -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -16,8 +17,8 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
-        </TextBlock>
+        <TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"/>
+        <Button Grid.Column="2" Grid.Row="0"/>
         <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
             <ListBox.ItemTemplate>
                 <DataTemplate>

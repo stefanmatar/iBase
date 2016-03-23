@@ -16,8 +16,14 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+        <ComboBox Grid.Column="0" Grid.Row="0" IsSynchronizedWithCurrentItem="True">
+            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track"/>
+        </ComboBox>
+        <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2">
         </TextBlock>
         <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2">
             <ListBox.ItemTemplate>
@@ -28,8 +34,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" Margin="3" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
-            <TextBlock Text="Now playing:"/>
+        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" Margin="3" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2" Grid.ColumnSpan="2">
+            <TextBlock Text="Infos:"/>
         </StackPanel>
     </Grid>
 </UserControl>
