@@ -9,49 +9,52 @@ namespace iBase
 {
     class SpotifyAPI
     {
-        private static SpotifyWebAPI _spotify;
-
-        public SpotifyAPI()
-        {
-            _spotify = new SpotifyWebAPI()
-            {
-                UseAuth = false
-            };
-        }
-
         //C# Objects created with http://json2csharp.com/ and parsed with JSON.NET
         //Testoutput: https://api.spotify.com/v1/search?q=love&type=album
-        public List<Item_Artist> SearchArtists(string artistname)
+        public string SearchArtists(string artistname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + artistname + "&type=artist");
             StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
             string json = reader.ReadToEnd();
 
-            Artists_Artist a = JsonConvert.DeserializeObject<Artists_Artist>(json);
+            //Artists_Artist a = JsonConvert.DeserializeObject<Artists_Artist>(json);
 
             //Returns all artists having the searched name:
-            return a.items; //one can get the id via a.items[0|1|2|etc.].external_urls.spotify;
+            //return a.items; //one can get the id via a.items[0|1|2|etc.].external_urls.spotify;
+
+            return json;
         }
 
-        public List<Item_Track> SearchTracks(string trackname)
+        public string SearchTracks(string trackname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + trackname + "&type=track");
             StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
             string json = reader.ReadToEnd();
 
-            Tracks_Track a = JsonConvert.DeserializeObject<Tracks_Track>(json);
-
-            return a.items;
+            //Tracks_Track a = JsonConvert.DeserializeObject<Tracks_Track>(json);
+            //return a.items;
+            return json;
         }
-        public List<Item_Album> SearchAlbums(string albumname)
+        public string SearchAlbums(string albumname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + albumname + "&type=album");
-            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+            //getting the response
+            WebResponse response = request.GetResponse();
+            //checking the status of the response
+            //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+            //returning the stream of the request
+            Stream dataStream = response.GetResponseStream();
+            //reading the dataStream
+            StreamReader reader = new StreamReader(dataStream);
             string json = reader.ReadToEnd();
 
-            Albums_Album a = JsonConvert.DeserializeObject<Albums_Album>(json);
+            return json;
+        }
 
-            return a.items;
+        public Artists_Artist SearchArtistViaID(string id)
+        {
+
+            return null;
         }
     }
 }

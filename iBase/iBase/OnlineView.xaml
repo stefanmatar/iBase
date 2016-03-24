@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        Height="300" Width="300">
+        Height="350" Width="480">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -18,24 +18,31 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" Grid.Row="0" IsSynchronizedWithCurrentItem="True">
+        <ComboBox x:Name="SearchType" Grid.Column="0" Grid.Row="0" IsSynchronizedWithCurrentItem="True" Margin="3">
             <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True"/>
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track"/>
         </ComboBox>
-        <TextBlock Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2">
-        </TextBlock>
-        <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2">
+        <TextBox x:Name="SearchTerm" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="3" >
+            <TextBox.InputBindings>
+                <KeyBinding Command="{Binding Search}" Key="Return" />
+                <KeyBinding Command="{Binding Search}" Key="Enter" />
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button Click="Search_Click" Grid.Column="4" Grid.Row="0" Content="Search" Margin="3"/>
+        <TreeView x:Name="InfoBox" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
+	        Loaded="InfoBox_Loaded"
+	        SelectedItemChanged="InfoBox_SelectedItemChanged">
+        </TreeView>
+        <ListBox x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
+                 SelectionChanged="LeftListBoxName_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="Test"></TextBlock>
+                        
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" Margin="3" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2" Grid.ColumnSpan="2">
-            <TextBlock Text="Infos:"/>
-        </StackPanel>
     </Grid>
 </UserControl>

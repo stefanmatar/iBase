@@ -23,6 +23,7 @@ namespace iBase
         public MainWindow()
         {
             InitializeComponent();
+            MainWindowSpace.Children.Add(new OnlineView());
         }
         private void OnlineMenuItemClick(object sender, RoutedEventArgs e)
         {

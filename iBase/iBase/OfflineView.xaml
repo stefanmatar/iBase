@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
-        Height="300" Width="300">
-    <!-- Height and width will be deleted later on! -->
+        Height="280" Width="480">
+    <!-- Height and width must be deleted later! -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -17,9 +17,9 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"/>
-        <Button Grid.Column="2" Grid.Row="0"/>
-        <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2">
+        <TextBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Margin="3"/>
+        <Button Grid.Column="2" Grid.Row="0" Margin="3" Content="Search"/>
+        <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
@@ -29,15 +29,17 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ListBox x:Name="MiddleListBoxName" Grid.Column="1" Grid.Row="1" ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}" DisplayMemberPath="S_Name" Grid.RowSpan="2">
+        <ListBox x:Name="MiddleListBoxName" Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" Margin="3"
+                 ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}"
+                 DisplayMemberPath="S_Name">
         </ListBox>
-        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" Margin="3" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
-            <TextBlock Text="{Binding Path=Artist_Name}"/>
-            <TextBlock Text="{Binding Path=Album_Name}"/>
-            <TextBlock Text="{Binding Path=Track_Name}"/>
-            <Button x:Name="SaveClick" Content="Save" Click="SaveButtonName_Click"/>
-            <Button x:Name="NewClick" Content="Create new" Click="NewClick_Click"/>
-            <Button x:Name="DeleteClick" Content="Delete" Click="DeleteClick_Click"/>
+        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
+            <TextBlock Text="{Binding Path=Artist_Name}" Margin="3"/>
+            <TextBlock Text="{Binding Path=Album_Name}" Margin="3"/>
+            <TextBlock Text="{Binding Path=Track_Name}" Margin="3"/>
+            <Button x:Name="SaveClick" Content="Save" Click="SaveButtonName_Click" Margin="3"/>
+            <Button x:Name="NewClick" Content="Create new" Click="NewClick_Click" Margin="3"/>
+            <Button x:Name="DeleteClick" Content="Delete" Click="DeleteClick_Click" Margin="3"/>
         </StackPanel>
     </Grid>
 </UserControl>
