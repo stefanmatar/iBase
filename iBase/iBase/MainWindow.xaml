@@ -13,5 +13,12 @@
             <MenuItem Header="Offline" Click="OfflineMenuItemClick"/>
         </Menu>
         <Grid x:Name="MainWindowSpace" />
+        
+        <!-- Effortless data binding:
+        public dynamic SomeData { get; set; }
+        SomeData.WhatEver = "Yo Man!";
+        
+        <TextBlock Text="{Binding SomeData.WhatEver}" />
+        -->
     </DockPanel>
 </Window>

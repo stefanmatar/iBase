@@ -1,9 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using NAudio.Wave;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,6 +17,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace iBase
 {
@@ -58,19 +62,48 @@ namespace iBase
             {
                 case "Album":
                     string albums = spotify.SearchAlbums(term);
-                    
-                    InfoBox.Items.Add(albums); ;
+
+                    InfoBox.Items.Add(albums);
                     break;
                 case "Artist":
-                    string artists = spotify.SearchArtists(term);
+                    InfoBox.Items.Clear();
+                    List<Artist> artists = spotify.SearchArtists(term);
 
-                    InfoBox.Items.Add(artists); ;
+                    foreach (Artist a in artists)
+                    {
+                        TreeViewItem newChild = new TreeViewItem();
+                        newChild.Header = a.name;
+                        newChild.Tag = a.id;
+                        newChild.ItemsSource = new string[] { "Follower: " + a.followers_total, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
+                        InfoBox.Items.Add(newChild);
+                    }
                     break;
                 case "Track":
-                    string tracks = spotify.SearchTracks(term);
+                    InfoBox.Items.Clear();
+                    List<Track> tracks = spotify.SearchTracks(term);
 
-                    InfoBox.Items.Add(tracks); ;
+                    foreach (Track a in tracks)
+                    {
+                        TreeViewItem newChild = new TreeViewItem();
+                        newChild.Header = a.name;
+                        newChild.Tag = a.id;
+                        TimeSpan t = TimeSpan.FromMilliseconds(a.duration_ms);
+                        newChild.ItemsSource = new string[] { "Disk number: " + a.disc_number, "Track number: " + a.track_number, "Explicity: " + a.explicity, "Duration: " + String.Format("{0}:{1:D2}", t.Minutes, t.Seconds), "Album:" + a.album, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
+                        InfoBox.Items.Add(newChild);
+                    }
                     break;
+            }
+        }
+        private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs args)
+        {
+            SpotifyAPI spotify = new SpotifyAPI();
+            if (sender is TreeViewItem && !((TreeViewItem)sender).IsSelected)
+                return;
+
+            Trace.WriteLine(((TreeViewItem)sender).Tag + " Doubleclicked!");
+            if(SearchType.SelectedValue.Equals("Track"))
+            {
+                PlayTrack(spotify.GetTrackFromID(((TreeViewItem)sender).Tag + "").preview_url);
             }
         }
 
@@ -81,17 +114,10 @@ namespace iBase
 
         private void InfoBox_Loaded(object sender, RoutedEventArgs e)
         {
-            // ... Create a TreeViewItem.
             TreeViewItem item = new TreeViewItem();
-            item.Header = "Album 1";
-            item.ItemsSource = new string[] { "Title 1", "Title 2", "Title 3" };
-
-            // ... Create a second TreeViewItem.
+            item.Header = "Doubleclick an entry";
             TreeViewItem item2 = new TreeViewItem();
-            item2.Header = "Album 2";
-            item2.ItemsSource = new string[] { "Title 1", "Title 2", "Title 3" };
-
-            // ... Get TreeView reference and add both items.
+            item2.Header = "to get more information!";
             var tree = sender as TreeView;
             tree.Items.Add(item);
             tree.Items.Add(item2);
@@ -106,13 +132,107 @@ namespace iBase
             {
                 // ... Handle a TreeViewItem.
                 var item = tree.SelectedItem as TreeViewItem;
-                //this.Title = "Selected header: " + item.Header.ToString();
+                //this.Title = "Selected header: " + item.Header;
+                Trace.WriteLine("User selected " + item.Header);
             }
             else if (tree.SelectedItem is string)
             {
                 // ... Handle a string.
-                //this.Title = "Selected: " + tree.SelectedItem.ToString();
+                //this.Title = "Selected: " + tree.SelectedItem;
+                Trace.WriteLine("Selected: " + tree.SelectedItem);
             }
+        }
+
+        private void SearchType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SearchType != null && SearchTerm != null)
+                SearchTypeLabel.Content = "Search result for " + SearchType.SelectedValue + ":";
+            else
+                if (SearchTypeLabel != null)
+                SearchTypeLabel.Content = "Search result for Album:";
+        }
+
+        private MediaPlayer mediaPlayer = new MediaPlayer();
+
+        public void PlayTrack(string url)
+        {
+            //WebClient webClient = new WebClient();
+            //string path = System.IO.Path.GetTempPath() + "\\" + RandomString() + ".mp3";
+            //webClient.DownloadFile(url, path);
+
+            //mediaPlayer.Open(new Uri(path));
+
+            //DispatcherTimer timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(1);
+            //timer.Tick += timer_Tick;
+            //timer.Start();
+            PlayMp3FromUrl(url);
+        }
+        public static void PlayMp3FromUrl(string url)
+        {
+            using (Stream ms = new MemoryStream())
+            {
+                using (Stream stream = WebRequest.Create(url)
+                    .GetResponse().GetResponseStream())
+                {
+                    byte[] buffer = new byte[32768];
+                    int read;
+                    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        ms.Write(buffer, 0, read);
+                    }
+                }
+
+                ms.Position = 0;
+                using (WaveStream blockAlignedStream =
+                    new BlockAlignReductionStream(
+                        WaveFormatConversionStream.CreatePcmStream(
+                            new Mp3FileReader(ms))))
+                {
+                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
+                    {
+                        waveOut.Init(blockAlignedStream);
+                        waveOut.Play();
+                        while (waveOut.PlaybackState == PlaybackState.Playing)
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                    }
+                }
+            }
+        }
+
+        void timer_Tick(object sender, EventArgs e)
+        {
+            if (mediaPlayer.Source != null)
+                lblStatus.Content = String.Format("{0} / {1}", mediaPlayer.Position.ToString(@"mm\:ss"), mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss"));
+            else
+                lblStatus.Content = "No file selected...";
+        }
+
+        private void Play_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.Play();
+
+        }
+
+        private void Pause_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.Pause();
+
+        }
+
+        private void Stop_Click(object sender, RoutedEventArgs e)
+        {
+            mediaPlayer.Stop();
+
+        }
+        public static string RandomString()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(chars, 11)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
     public class ActionCommand : ICommand
