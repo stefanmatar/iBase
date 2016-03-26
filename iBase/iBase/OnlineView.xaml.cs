@@ -1,43 +1,31 @@
 ﻿using NAudio.Wave;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace iBase
 {
-    /// <summary>
-    /// Interaction logic for OnlineView.xaml
-    /// </summary>
     public partial class OnlineView : UserControl
     {
-        Track currentTrack { get; set; }
-        WaveOut waveOut { get; set; }
-        BackgroundWorker bgWorker;
-        AutoResetEvent doneEvent = new AutoResetEvent(false);
+        private Track currentTrack { get; set; }
+        public WaveOut waveOut { get; set; }
+        public BackgroundWorker bgWorker;
         private MediaPlayer mediaPlayer = new MediaPlayer();
 
         public OnlineView()
         {
             InitializeComponent();
+            Stop.IsEnabled = false;
+            Unloaded += ExitEvent;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -53,9 +41,17 @@ namespace iBase
             switch (type)
             {
                 case "Album":
-                    string albums = spotify.SearchAlbums(term);
+                    InfoBox.Items.Clear();
+                    List<Album> albums = spotify.SearchAlbums(term);
 
-                    InfoBox.Items.Add(albums);
+                    foreach (Album a in albums)
+                    {
+                        TreeViewItem newChild = new TreeViewItem();
+                        newChild.Header = a.name;
+                        newChild.Tag = a.id;
+                        newChild.ItemsSource = new string[] { "Link: " + a.href};
+                        InfoBox.Items.Add(newChild);
+                    }
                     break;
                 case "Artist":
                     InfoBox.Items.Clear();
@@ -86,45 +82,6 @@ namespace iBase
                     break;
             }
         }
-        private void OnItemMouseDoubleClick(object sender, MouseButtonEventArgs args)
-        {
-            SpotifyAPI spotify = new SpotifyAPI();
-            if (sender is TreeViewItem && !((TreeViewItem)sender).IsSelected)
-                return;
-
-            Trace.WriteLine(((TreeViewItem)sender).Tag + " Doubleclicked!");
-            if (SearchType.SelectedValue.Equals("Track"))
-            {
-                currentTrack = spotify.GetTrackFromID(((TreeViewItem)sender).Tag + "");
-                var image = new Image();
-                var fullFilePath = currentTrack.imageurl;
-
-                BitmapImage bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(fullFilePath, UriKind.Absolute);
-                bitmap.EndInit();
-
-                image.Source = bitmap;
-                CoverImage.Children.Add(image);
-
-                if (bgWorker != null && bgWorker.IsBusy)
-                {
-                    bgWorker.CancelAsync();
-                }
-                if(waveOut != null)
-                    waveOut.Stop();
-                bgWorker = new BackgroundWorker();
-                bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
-                bgWorker.ProgressChanged += new ProgressChangedEventHandler
-                        (bgWorker_ProgressChanged);
-                bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler
-                        (bgWorker_RunWorkerCompleted);
-                bgWorker.WorkerReportsProgress = true;
-                bgWorker.WorkerSupportsCancellation = true;
-
-                bgWorker.RunWorkerAsync(currentTrack.preview_url);
-            }
-        }
 
         private void Search_Click(object sender, RoutedEventArgs e)
         {
@@ -144,21 +101,28 @@ namespace iBase
 
         private void InfoBox_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            var tree = sender as TreeView;
+            if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null)
+            {
+                SpotifyAPI spotify = new SpotifyAPI();
 
-            // ... Determine type of SelectedItem.
-            if (tree.SelectedItem is TreeViewItem)
-            {
-                // ... Handle a TreeViewItem.
-                var item = tree.SelectedItem as TreeViewItem;
-                //this.Title = "Selected header: " + item.Header;
-                Trace.WriteLine("User selected " + item.Header);
-            }
-            else if (tree.SelectedItem is string)
-            {
-                // ... Handle a string.
-                //this.Title = "Selected: " + tree.SelectedItem;
-                Trace.WriteLine("Selected: " + tree.SelectedItem);
+                TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
+
+                currentTrack = spotify.GetTrackFromID(item.Tag + "");
+                Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
+
+                StopPlayBack();
+
+                bgWorker = new BackgroundWorker();
+                bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
+                bgWorker.ProgressChanged += new ProgressChangedEventHandler
+                        (bgWorker_ProgressChanged);
+                bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler
+                        (bgWorker_RunWorkerCompleted);
+                bgWorker.WorkerReportsProgress = true;
+                bgWorker.WorkerSupportsCancellation = true;
+
+                Stop.IsEnabled = true;
+                bgWorker.RunWorkerAsync(currentTrack.preview_url);
             }
         }
 
@@ -171,30 +135,28 @@ namespace iBase
                 SearchTypeLabel.Content = "Search result for Album:";
         }
 
-        void timer_Tick(object sender, EventArgs e)
-        {
-            //if (mediaPlayer.Source != null)
-            //lblStatus.Content = String.Format("{0} / {1}", mediaPlayer.Position.ToString(@"mm\:ss"), mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss"));
-            //else
-            //lblStatus.Content = "No file selected...";
-        }
-
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            if (bgWorker.IsBusy)
+            StopPlayBack();
+        }
+
+        public void StopPlayBack()
+        {
+            if (bgWorker != null && bgWorker.IsBusy)
             {
                 bgWorker.CancelAsync();
             }
+            if (waveOut != null)
+                waveOut.Stop();
+            Stop.IsEnabled = false;
         }
 
         void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            // The background process is complete. We need to inspect
-            // our response to see if an error occurred, a cancel was
-            // requested or if we completed successfully.  
             if (e.Cancelled)
             {
                 lblStatus.Content = "Task Cancelled.";
+                StopPlayBack();
             }
             else if (e.Error != null)
             {
@@ -213,9 +175,6 @@ namespace iBase
         void bgWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             string url = e.Argument + "";
-            // The sender is the BackgroundWorker object we need it to
-            // report progress and check for cancellation.
-            //NOTE : Never play with the UI thread here...
             Stream ms = new MemoryStream();
             Stream stream = WebRequest.Create(url)
                     .GetResponse().GetResponseStream();
@@ -235,30 +194,22 @@ namespace iBase
             while (waveOut.PlaybackState == PlaybackState.Playing)
             {
                 Thread.Sleep(100);
+                bgWorker.ReportProgress(5);
             }
-
-
-            // Periodically report progress to the main thread so that it can
-            // update the UI.  In most cases you'll just need to send an
-            // integer that will update a ProgressBar                    
-            //bgWorker.ReportProgress(i);
-            // Periodically check if a cancellation request is pending.
-            // If the user clicks cancel the line
-            // m_AsyncWorker.CancelAsync(); if ran above.  This
-            // sets the CancellationPending to true.
-            // You must check this flag in here and react to it.
-            // We react to it by setting e.Cancel to true and leaving
             if (bgWorker.CancellationPending)
             {
                 // Set the e.Cancel flag so that the WorkerCompleted event
                 // knows that the process was cancelled.
                 e.Cancel = true;
                 bgWorker.ReportProgress(0);
-                waveOut.Stop();
-
                 return;
             }
             bgWorker.ReportProgress(100);
+        }
+        void ExitEvent(Object sender, RoutedEventArgs e)
+        {
+            Loaded -= ExitEvent;
+            StopPlayBack();
         }
     }
     public class ActionCommand : ICommand

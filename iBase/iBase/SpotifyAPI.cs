@@ -68,28 +68,74 @@ namespace iBase
                 ListOfTracks.Add(track);
             }
 
-            //Returns all artists having the searched name:
-            return ListOfTracks; //one can get the id via a.items[0|1|2|etc.].external_urls.spotify;
+            return ListOfTracks;
         }
-        public string SearchAlbums(string albumname)
+        public List<Album> SearchAlbums(string albumname)
         {
-            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + albumname + "&offset=0&limit=100&type=album");
-            //getting the response
-            WebResponse response = request.GetResponse();
-            //checking the status of the response
-            //Console.WriteLine(((HttpWebResponse)response).StatusDescription);
-            //returning the stream of the request
-            Stream dataStream = response.GetResponseStream();
-            //reading the dataStream
-            StreamReader reader = new StreamReader(dataStream);
+            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + albumname + "&offset=0&limit=50&type=album");
+            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
             string json = reader.ReadToEnd();
 
-            return json;
+            var converter = new ExpandoObjectConverter();
+            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+
+            List<Album> ListOfTracks = new List<Album>();
+
+            foreach (var tempalbum in jsonobject.albums.items)
+            {
+                Album album = new Album();
+                album.id = tempalbum.id;
+                album.href = tempalbum.href;
+                if (tempalbum.images.Count > 1)
+                    album.imageurl = tempalbum.images[1].url;
+                album.name = tempalbum.name;
+
+                ListOfTracks.Add(album);
+            }
+
+            return ListOfTracks;
+        }
+
+        public Album GetAlbumFromID(string id)
+        {
+            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/albums/" + id);
+            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+            string json = reader.ReadToEnd();
+
+            var converter = new ExpandoObjectConverter();
+            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+
+            Album album = new Album();
+            album.id = jsonobject.id;
+            album.href = jsonobject.href;
+            if (jsonobject.images.Count > 1)
+                album.imageurl = jsonobject.images[1].url;
+            album.name = jsonobject.name;
+
+            return album;
         }
 
         public Artist GetArtistFromID(string id)
         {
-            return null;
+            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/artists/" + id);
+            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+            string json = reader.ReadToEnd();
+
+            var converter = new ExpandoObjectConverter();
+            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+
+            Artist artist = new Artist();
+            //artist.albums = tempartist.albums;
+            artist.followers_total = jsonobject.followers.total;
+            //artist.genres = tempartist.genres.Cast<string>();
+            artist.href = jsonobject.href;
+            artist.id = jsonobject.id;
+            if (jsonobject.images.Count > 1)
+                artist.imageurl = jsonobject.images[1].url;
+            artist.name = jsonobject.name;
+            artist.popularity = jsonobject.popularity;
+            artist.type = jsonobject.type;
+            return artist;
         }
 
         public Track GetTrackFromID(string id)
@@ -110,9 +156,16 @@ namespace iBase
             track.name = jsonobject.name;
             track.popularity = jsonobject.popularity;
             track.preview_url = jsonobject.preview_url;
-            track.imageurl= jsonobject.album.images[0].url;
+            track.imageurl = jsonobject.album.images[0].url;
             track.track_number = jsonobject.track_number;
             track.type = jsonobject.type;
+
+            List<Artist> artists = new List<Artist>();
+            foreach (var temartist in jsonobject.artists)
+            {
+                artists.Add(GetArtistFromID(temartist.id));
+            }
+            track.artists = artists;
 
             return track;
         }

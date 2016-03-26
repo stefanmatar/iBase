@@ -7,13 +7,6 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Height="430" Width="480">
-    <UserControl.Resources>
-        <Storyboard x:Key="Spin">
-            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ellipse1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
-                <SplineDoubleKeyFrame KeyTime="00:00:10" Value="360"/>
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -39,11 +32,6 @@
         <TreeView x:Name="InfoBox" Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
 	        Loaded="InfoBox_Loaded"
 	        SelectedItemChanged="InfoBox_SelectedItemChanged">
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="{x:Type TreeViewItem}">
-                    <EventSetter Event="MouseDoubleClick" Handler="OnItemMouseDoubleClick" />
-                </Style>
-            </TreeView.ItemContainerStyle>
         </TreeView>
         <StackPanel x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3">
             <Label Name="lblStatus" Content="Not playing..." HorizontalContentAlignment="Center" Margin="5" />
@@ -51,10 +39,16 @@
             <Image x:Name="Icon" Source="icon.png" 
                RenderTransformOrigin=".5,.5"
                Height="300">
+                <Image.OpacityMask>
+                    <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                        <GradientStop Color="#ffffffff" Offset="1" />
+                        <GradientStop Color="#00ffffff" Offset="1" />
+                    </RadialGradientBrush>
+                </Image.OpacityMask>
                 <Image.RenderTransform>
                     <RotateTransform x:Name="RotateTransform" Angle="0" />
                 </Image.RenderTransform>
-                <!--Image.Style>
+                <Image.Style>
                     <Style>
                         <Style.Triggers>
                             <Trigger Property="Image.IsEnabled" Value="True">
@@ -65,7 +59,7 @@
                                             Storyboard.TargetProperty="RenderTransform.Angle"
                                             From="0"
                                             To="360"
-                                            Duration="0:0:10"
+                                            Duration="0:0:40"
                                             RepeatBehavior="Forever" />
                                         </Storyboard>
                                     </BeginStoryboard>
@@ -73,7 +67,7 @@
                             </Trigger>
                         </Style.Triggers>
                     </Style>
-                </-->
+                </Image.Style>
             </Image>
             <WrapPanel HorizontalAlignment="Center">
                 <Button x:Name="Stop" Margin="5 0" Click="Stop_Click">Pause</Button>
