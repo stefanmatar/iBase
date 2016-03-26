@@ -3,11 +3,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +17,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -26,29 +29,18 @@ namespace iBase
     /// </summary>
     public partial class OnlineView : UserControl
     {
-        private ICommand someCommand;
-        public ICommand SomeCommand
-        {
-            get
-            {
-                return someCommand
-                    ?? (someCommand = new ActionCommand(() =>
-                    {
-                        Search();
-                    }));
-            }
-        }
+        Track currentTrack { get; set; }
+        WaveOut waveOut { get; set; }
+        BackgroundWorker bgWorker;
+        AutoResetEvent doneEvent = new AutoResetEvent(false);
+        private MediaPlayer mediaPlayer = new MediaPlayer();
+
         public OnlineView()
         {
             InitializeComponent();
         }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            //LeftListBoxName.ItemsSource = db.klassens.ToList();
-
-        }
-
-        private void LeftListBoxName_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
@@ -101,9 +93,36 @@ namespace iBase
                 return;
 
             Trace.WriteLine(((TreeViewItem)sender).Tag + " Doubleclicked!");
-            if(SearchType.SelectedValue.Equals("Track"))
+            if (SearchType.SelectedValue.Equals("Track"))
             {
-                PlayTrack(spotify.GetTrackFromID(((TreeViewItem)sender).Tag + "").preview_url);
+                currentTrack = spotify.GetTrackFromID(((TreeViewItem)sender).Tag + "");
+                var image = new Image();
+                var fullFilePath = currentTrack.imageurl;
+
+                BitmapImage bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(fullFilePath, UriKind.Absolute);
+                bitmap.EndInit();
+
+                image.Source = bitmap;
+                CoverImage.Children.Add(image);
+
+                if (bgWorker != null && bgWorker.IsBusy)
+                {
+                    bgWorker.CancelAsync();
+                }
+                if(waveOut != null)
+                    waveOut.Stop();
+                bgWorker = new BackgroundWorker();
+                bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
+                bgWorker.ProgressChanged += new ProgressChangedEventHandler
+                        (bgWorker_ProgressChanged);
+                bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler
+                        (bgWorker_RunWorkerCompleted);
+                bgWorker.WorkerReportsProgress = true;
+                bgWorker.WorkerSupportsCancellation = true;
+
+                bgWorker.RunWorkerAsync(currentTrack.preview_url);
             }
         }
 
@@ -152,87 +171,94 @@ namespace iBase
                 SearchTypeLabel.Content = "Search result for Album:";
         }
 
-        private MediaPlayer mediaPlayer = new MediaPlayer();
-
-        public void PlayTrack(string url)
-        {
-            //WebClient webClient = new WebClient();
-            //string path = System.IO.Path.GetTempPath() + "\\" + RandomString() + ".mp3";
-            //webClient.DownloadFile(url, path);
-
-            //mediaPlayer.Open(new Uri(path));
-
-            //DispatcherTimer timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromSeconds(1);
-            //timer.Tick += timer_Tick;
-            //timer.Start();
-            PlayMp3FromUrl(url);
-        }
-        public static void PlayMp3FromUrl(string url)
-        {
-            using (Stream ms = new MemoryStream())
-            {
-                using (Stream stream = WebRequest.Create(url)
-                    .GetResponse().GetResponseStream())
-                {
-                    byte[] buffer = new byte[32768];
-                    int read;
-                    while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        ms.Write(buffer, 0, read);
-                    }
-                }
-
-                ms.Position = 0;
-                using (WaveStream blockAlignedStream =
-                    new BlockAlignReductionStream(
-                        WaveFormatConversionStream.CreatePcmStream(
-                            new Mp3FileReader(ms))))
-                {
-                    using (WaveOut waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback()))
-                    {
-                        waveOut.Init(blockAlignedStream);
-                        waveOut.Play();
-                        while (waveOut.PlaybackState == PlaybackState.Playing)
-                        {
-                            System.Threading.Thread.Sleep(100);
-                        }
-                    }
-                }
-            }
-        }
-
         void timer_Tick(object sender, EventArgs e)
         {
-            if (mediaPlayer.Source != null)
-                lblStatus.Content = String.Format("{0} / {1}", mediaPlayer.Position.ToString(@"mm\:ss"), mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss"));
-            else
-                lblStatus.Content = "No file selected...";
-        }
-
-        private void Play_Click(object sender, RoutedEventArgs e)
-        {
-            mediaPlayer.Play();
-
-        }
-
-        private void Pause_Click(object sender, RoutedEventArgs e)
-        {
-            mediaPlayer.Pause();
-
+            //if (mediaPlayer.Source != null)
+            //lblStatus.Content = String.Format("{0} / {1}", mediaPlayer.Position.ToString(@"mm\:ss"), mediaPlayer.NaturalDuration.TimeSpan.ToString(@"mm\:ss"));
+            //else
+            //lblStatus.Content = "No file selected...";
         }
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            mediaPlayer.Stop();
-
+            if (bgWorker.IsBusy)
+            {
+                bgWorker.CancelAsync();
+            }
         }
-        public static string RandomString()
+
+        void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, 11)
-              .Select(s => s[random.Next(s.Length)]).ToArray());
+            // The background process is complete. We need to inspect
+            // our response to see if an error occurred, a cancel was
+            // requested or if we completed successfully.  
+            if (e.Cancelled)
+            {
+                lblStatus.Content = "Task Cancelled.";
+            }
+            else if (e.Error != null)
+            {
+                lblStatus.Content = "Error while performing background operation.";
+            }
+            else
+            {
+                // Everything completed normally.
+            }
+        }
+
+        void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+        }
+
+        void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string url = e.Argument + "";
+            // The sender is the BackgroundWorker object we need it to
+            // report progress and check for cancellation.
+            //NOTE : Never play with the UI thread here...
+            Stream ms = new MemoryStream();
+            Stream stream = WebRequest.Create(url)
+                    .GetResponse().GetResponseStream();
+            byte[] buffer = new byte[32768];
+            int read;
+            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                ms.Write(buffer, 0, read);
+            }
+
+            ms.Position = 0;
+            WaveStream blockAlignedStream = new BlockAlignReductionStream(WaveFormatConversionStream.CreatePcmStream(new Mp3FileReader(ms)));
+            waveOut = new WaveOut(WaveCallbackInfo.FunctionCallback());
+            waveOut.Init(blockAlignedStream);
+            waveOut.Play();
+
+            while (waveOut.PlaybackState == PlaybackState.Playing)
+            {
+                Thread.Sleep(100);
+            }
+
+
+            // Periodically report progress to the main thread so that it can
+            // update the UI.  In most cases you'll just need to send an
+            // integer that will update a ProgressBar                    
+            //bgWorker.ReportProgress(i);
+            // Periodically check if a cancellation request is pending.
+            // If the user clicks cancel the line
+            // m_AsyncWorker.CancelAsync(); if ran above.  This
+            // sets the CancellationPending to true.
+            // You must check this flag in here and react to it.
+            // We react to it by setting e.Cancel to true and leaving
+            if (bgWorker.CancellationPending)
+            {
+                // Set the e.Cancel flag so that the WorkerCompleted event
+                // knows that the process was cancelled.
+                e.Cancel = true;
+                bgWorker.ReportProgress(0);
+                waveOut.Stop();
+
+                return;
+            }
+            bgWorker.ReportProgress(100);
         }
     }
     public class ActionCommand : ICommand

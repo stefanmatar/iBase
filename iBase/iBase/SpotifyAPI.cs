@@ -40,30 +40,6 @@ namespace iBase
             return ListOfArtists;
         }
 
-        public Track GetTrackFromID(string id)
-        {
-            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/tracks/" + id);
-            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
-            string json = reader.ReadToEnd();
-
-            var converter = new ExpandoObjectConverter();
-            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
-
-            Track track = new Track();
-            track.id = jsonobject.id;
-            track.disc_number = jsonobject.disc_number;
-            track.duration_ms = jsonobject.duration_ms;
-            track.explicity = jsonobject.@explicit;
-            track.href = jsonobject.href;
-            track.name = jsonobject.name;
-            track.popularity = jsonobject.popularity;
-            track.preview_url = jsonobject.preview_url;
-            track.track_number = jsonobject.track_number;
-            track.type = jsonobject.type;
-
-            return track;
-        }
-
         public List<Track> SearchTracks(string trackname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + trackname + "&offset=0&limit=50&type=track");
@@ -111,9 +87,34 @@ namespace iBase
             return json;
         }
 
-        public Artist SearchArtistViaID(string id)
+        public Artist GetArtistFromID(string id)
         {
             return null;
+        }
+
+        public Track GetTrackFromID(string id)
+        {
+            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/tracks/" + id);
+            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+            string json = reader.ReadToEnd();
+
+            var converter = new ExpandoObjectConverter();
+            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+
+            Track track = new Track();
+            track.id = jsonobject.id;
+            track.disc_number = jsonobject.disc_number;
+            track.duration_ms = jsonobject.duration_ms;
+            track.explicity = jsonobject.@explicit;
+            track.href = jsonobject.href;
+            track.name = jsonobject.name;
+            track.popularity = jsonobject.popularity;
+            track.preview_url = jsonobject.preview_url;
+            track.imageurl= jsonobject.album.images[0].url;
+            track.track_number = jsonobject.track_number;
+            track.type = jsonobject.type;
+
+            return track;
         }
     }
 }

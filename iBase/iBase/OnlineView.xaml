@@ -6,12 +6,19 @@
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        Height="280" Width="480">
+        Height="430" Width="480">
+    <UserControl.Resources>
+        <Storyboard x:Key="Spin">
+            <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetName="ellipse1" Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[0].(RotateTransform.Angle)" RepeatBehavior="Forever">
+                <SplineDoubleKeyFrame KeyTime="00:00:10" Value="360"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="12*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -40,10 +47,36 @@
         </TreeView>
         <StackPanel x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3">
             <Label Name="lblStatus" Content="Not playing..." HorizontalContentAlignment="Center" Margin="5" />
+            <WrapPanel x:Name="CoverImage"></WrapPanel>
+            <Image x:Name="Icon" Source="icon.png" 
+               RenderTransformOrigin=".5,.5"
+               Height="300">
+                <Image.RenderTransform>
+                    <RotateTransform x:Name="RotateTransform" Angle="0" />
+                </Image.RenderTransform>
+                <!--Image.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <Trigger Property="Image.IsEnabled" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                            Storyboard.TargetProperty="RenderTransform.Angle"
+                                            From="0"
+                                            To="360"
+                                            Duration="0:0:10"
+                                            RepeatBehavior="Forever" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </-->
+            </Image>
             <WrapPanel HorizontalAlignment="Center">
-                <Button Name="Play" Click="Play_Click">Play</Button>
-                <Button Name="Pause" Margin="5,0" Click="Pause_Click">Pause</Button>
-                <Button Name="Stop" Click="Stop_Click">Stop</Button>
+                <Button x:Name="Stop" Margin="5 0" Click="Stop_Click">Pause</Button>
             </WrapPanel>
         </StackPanel>
     </Grid>

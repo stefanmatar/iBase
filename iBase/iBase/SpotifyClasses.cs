@@ -38,6 +38,7 @@ namespace iBase
         public string id { get; set; }
         public string name { get; set; }
         public long popularity { get; set; }
+        public string imageurl { get; set; }
         public string preview_url { get; set; }
         public long track_number { get; set; }
         public string type { get; set; }
