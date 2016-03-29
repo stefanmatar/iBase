@@ -157,6 +157,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>iBase.mdf</DependentUpon>
     </Content>
+    <Resource Include="play.png" />
+    <Resource Include="stop.png" />
     <Resource Include="icon.png" />
   </ItemGroup>
   <ItemGroup>

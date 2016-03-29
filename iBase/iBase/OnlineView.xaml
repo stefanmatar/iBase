@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
-        Loaded="Window_Loaded"
         Height="430" Width="480">
-    <Grid>
+    <Grid TextElement.Foreground="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
@@ -22,25 +21,68 @@
         <ComboBox x:Name="SearchType" Grid.Column="0" Grid.Row="0" IsSynchronizedWithCurrentItem="True" Margin="3"
                   SelectedValuePath="Content"
                   SelectionChanged="SearchType_SelectionChanged">
-            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True"/>
-            <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist"/>
-            <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track"/>
+            <ComboBox.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#0C1419" />
+            </ComboBox.Resources>
+            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True" Foreground="White"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
         </ComboBox>
-        <TextBox x:Name="SearchTerm" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="3"/>
-        <Button Click="Search_Click" Grid.Column="3" Grid.Row="0" Content="Search" Margin="3"/>
-        <Label x:Name="SearchTypeLabel" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Search result for Album:</Label>
-        <TreeView x:Name="InfoBox" Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
-	        Loaded="InfoBox_Loaded"
+        <TextBox Background="#182933" Foreground="White" x:Name="SearchTerm" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="3"/>
+        <Button Grid.Row="0" Grid.Column="3" Foreground="White" Click="Search_Click" Background="#182933" Content="Search" HorizontalAlignment="Stretch" Margin="3"/>
+        <Label TextElement.Foreground="White" x:Name="SearchTypeLabel" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Search result for Album:</Label>
+        <TreeView Background="#A9B1B8" Foreground="White" x:Name="InfoBox" Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
 	        SelectedItemChanged="InfoBox_SelectedItemChanged">
         </TreeView>
-        <StackPanel x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3">
-            <Label Name="lblStatus" Content="Not playing..." HorizontalContentAlignment="Center" Margin="5" />
-            <WrapPanel x:Name="CoverImage"></WrapPanel>
+        <StackPanel TextElement.Foreground="White" x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3">
+            <DockPanel HorizontalAlignment="Stretch">
+                <Border BorderThickness="1" Background="Transparent" Height="22" Width="22">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="LightBlue" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button x:Name="Play" Height="20" Width="20" Click="Play_Click">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <StackPanel>
+                                    <Image Source="play.png" Height="20"/>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Border>
+                <Border BorderThickness="1" Background="Transparent" Margin="5" Height="22" Width="22" DockPanel.Dock="Right">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="BorderBrush" Value="LightBlue" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Button x:Name="Stop" Height="20" Width="20" Click="Stop_Click">
+                        <Button.Template>
+                            <ControlTemplate>
+                                <StackPanel>
+                                    <Image Source="stop.png" Height="20"/>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Border>
+                <Label TextElement.Foreground="White" Name="PlayingStatus" Content="Click a Track" Margin="5" HorizontalAlignment="Stretch"/>
+            </DockPanel>
             <Image x:Name="Icon" Source="icon.png" 
                RenderTransformOrigin=".5,.5"
                Height="300">
                 <Image.OpacityMask>
-                    <RadialGradientBrush GradientOrigin="0.5,0.5" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                    <RadialGradientBrush GradientOrigin="0.5 0.5" Center="0.5 0.5" RadiusX="0.5" RadiusY="0.5">
                         <GradientStop Color="#ffffffff" Offset="1" />
                         <GradientStop Color="#00ffffff" Offset="1" />
                     </RadialGradientBrush>
@@ -56,11 +98,11 @@
                                     <BeginStoryboard>
                                         <Storyboard>
                                             <DoubleAnimation
-                                            Storyboard.TargetProperty="RenderTransform.Angle"
-                                            From="0"
-                                            To="360"
-                                            Duration="0:0:40"
-                                            RepeatBehavior="Forever" />
+                                                Storyboard.TargetProperty="RenderTransform.Angle"
+                                                From="0"
+                                                To="360"
+                                                Duration="0:0:40"
+                                                RepeatBehavior="Forever" />
                                         </Storyboard>
                                     </BeginStoryboard>
                                 </Trigger.EnterActions>
@@ -69,9 +111,6 @@
                     </Style>
                 </Image.Style>
             </Image>
-            <WrapPanel HorizontalAlignment="Center">
-                <Button x:Name="Stop" Margin="5 0" Click="Stop_Click">Pause</Button>
-            </WrapPanel>
         </StackPanel>
     </Grid>
 </UserControl>

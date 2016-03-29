@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Windows;
@@ -28,11 +29,6 @@ namespace iBase
             Unloaded += ExitEvent;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Search()
         {
             string term = SearchTerm.Text;
@@ -44,12 +40,47 @@ namespace iBase
                     InfoBox.Items.Clear();
                     List<Album> albums = spotify.SearchAlbums(term);
 
-                    foreach (Album a in albums)
+                    if (albums != null)
+                        foreach (Album a in albums)
+                        {
+                            TreeViewItem newChild = new TreeViewItem();
+                            string header = a.name;
+                            newChild.Tag = a.id;
+
+                            List<string> albumitems = new List<string>();
+
+                            List<string> tracksList = new List<string>(a.tracks.Keys);
+                            if (tracksList.Count > 0)
+                            {
+                                albumitems.Add("Tracks:");
+                                foreach (string trackname in tracksList.ToList())
+                                {
+                                    albumitems.Add("- " + trackname);
+                                }
+                            }
+                            string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
+
+                            if (artistsList.Length == 1)
+                            {
+                                header += " by " + artistsList[0];
+                            }
+                            else if (artistsList.Length > 1)
+                            {
+                                albumitems.Add("Artists:");
+                                foreach (string artistname in artistsList)
+                                {
+                                    albumitems.Add("- " + artistname);
+                                }
+                            }
+                            newChild.Header = header;
+
+                            newChild.ItemsSource = albumitems;
+                            InfoBox.Items.Add(newChild);
+                        }
+                    else
                     {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = a.name;
-                        newChild.Tag = a.id;
-                        newChild.ItemsSource = new string[] { "Link: " + a.href};
+                        newChild.Header = "No internet connection!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
@@ -57,26 +88,39 @@ namespace iBase
                     InfoBox.Items.Clear();
                     List<Artist> artists = spotify.SearchArtists(term);
 
-                    foreach (Artist a in artists)
+                    if (artists != null)
+                        foreach (Artist a in artists)
+                        {
+                            TreeViewItem newChild = new TreeViewItem();
+                            newChild.Header = a.name;
+                            newChild.Tag = a.id;
+                            newChild.ItemsSource = new string[] { "Follower: " + a.followers_total, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
+                            InfoBox.Items.Add(newChild);
+                        }
+                    else
                     {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = a.name;
-                        newChild.Tag = a.id;
-                        newChild.ItemsSource = new string[] { "Follower: " + a.followers_total, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
+                        newChild.Header = "No internet connection!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
                 case "Track":
                     InfoBox.Items.Clear();
                     List<Track> tracks = spotify.SearchTracks(term);
-
-                    foreach (Track a in tracks)
+                    if (tracks != null)
+                        foreach (Track track in tracks)
+                        {
+                            TreeViewItem newChild = new TreeViewItem();
+                            newChild.Header = track.name;
+                            newChild.Tag = track.id;
+                            TimeSpan t = TimeSpan.FromMilliseconds(track.duration_ms);
+                            newChild.ItemsSource = new string[] { "Disk number: " + track.disc_number, "Track number: " + track.track_number, "Explicity: " + track.explicity, "Duration: " + String.Format("{0}:{1:D2}", t.Minutes, t.Seconds), "Album:" + track.album, "Link: " + track.href, "Typ: " + track.type, "Popularity: " + track.popularity + "/100" };
+                            InfoBox.Items.Add(newChild);
+                        }
+                    else
                     {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = a.name;
-                        newChild.Tag = a.id;
-                        TimeSpan t = TimeSpan.FromMilliseconds(a.duration_ms);
-                        newChild.ItemsSource = new string[] { "Disk number: " + a.disc_number, "Track number: " + a.track_number, "Explicity: " + a.explicity, "Duration: " + String.Format("{0}:{1:D2}", t.Minutes, t.Seconds), "Album:" + a.album, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
+                        newChild.Header = "No internet connection!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
@@ -88,17 +132,6 @@ namespace iBase
             Search();
         }
 
-        private void InfoBox_Loaded(object sender, RoutedEventArgs e)
-        {
-            TreeViewItem item = new TreeViewItem();
-            item.Header = "Doubleclick an entry";
-            TreeViewItem item2 = new TreeViewItem();
-            item2.Header = "to get more information!";
-            var tree = sender as TreeView;
-            tree.Items.Add(item);
-            tree.Items.Add(item2);
-        }
-
         private void InfoBox_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null)
@@ -108,30 +141,32 @@ namespace iBase
                 TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
 
                 currentTrack = spotify.GetTrackFromID(item.Tag + "");
-                Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
 
-                StopPlayBack();
-
-                bgWorker = new BackgroundWorker();
-                bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
-                bgWorker.ProgressChanged += new ProgressChangedEventHandler
-                        (bgWorker_ProgressChanged);
-                bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler
-                        (bgWorker_RunWorkerCompleted);
-                bgWorker.WorkerReportsProgress = true;
-                bgWorker.WorkerSupportsCancellation = true;
-
-                Stop.IsEnabled = true;
-                bgWorker.RunWorkerAsync(currentTrack.preview_url);
+                PlayCurrentTrack();
             }
+        }
+
+        public void PlayCurrentTrack()
+        {
+            StopPlayBack();
+            Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
+
+            bgWorker = new BackgroundWorker();
+            bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
+            bgWorker.ProgressChanged += new ProgressChangedEventHandler(bgWorker_ProgressChanged);
+            bgWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker_RunWorkerCompleted);
+            bgWorker.WorkerReportsProgress = true;
+            bgWorker.WorkerSupportsCancellation = true;
+
+            Stop.IsEnabled = true;
+            bgWorker.RunWorkerAsync(currentTrack.preview_url);
         }
 
         private void SearchType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SearchType != null && SearchTerm != null)
                 SearchTypeLabel.Content = "Search result for " + SearchType.SelectedValue + ":";
-            else
-                if (SearchTypeLabel != null)
+            else if (SearchTypeLabel != null)
                 SearchTypeLabel.Content = "Search result for Album:";
         }
 
@@ -155,12 +190,12 @@ namespace iBase
         {
             if (e.Cancelled)
             {
-                lblStatus.Content = "Task Cancelled.";
+                PlayingStatus.Content = "Nothing playing.";
                 StopPlayBack();
             }
             else if (e.Error != null)
             {
-                lblStatus.Content = "Error while performing background operation.";
+                PlayingStatus.Content = "Could not play track. Try again.";
             }
             else
             {
@@ -170,6 +205,7 @@ namespace iBase
 
         void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            PlayingStatus.Content = "Playing: " + currentTrack.name;
         }
 
         void bgWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -194,7 +230,11 @@ namespace iBase
             while (waveOut.PlaybackState == PlaybackState.Playing)
             {
                 Thread.Sleep(100);
-                bgWorker.ReportProgress(5);
+                try
+                {
+                    bgWorker.ReportProgress(5);
+                }
+                catch (Exception) { }
             }
             if (bgWorker.CancellationPending)
             {
@@ -204,12 +244,23 @@ namespace iBase
                 bgWorker.ReportProgress(0);
                 return;
             }
-            bgWorker.ReportProgress(100);
+            try {
+                bgWorker.ReportProgress(100);
+            }
+            catch (Exception) { }
         }
         void ExitEvent(Object sender, RoutedEventArgs e)
         {
             Loaded -= ExitEvent;
             StopPlayBack();
+        }
+
+        private void Play_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentTrack != null)
+            {
+                PlayCurrentTrack();
+            }
         }
     }
     public class ActionCommand : ICommand

@@ -12,13 +12,13 @@ namespace iBase
         public string name { get; set; }
         public string href { get; set; }
         public string imageurl { get; set; }
-        public string artist { get; set; }
-        public List<Track> tracks { get; set; }
+        public Dictionary<string, string> artists { get; set; }
+        public Dictionary<string, string> tracks { get; set; }
     }
     public class Artist
     {
         public long followers_total { get; set; }
-        public List<Album> albums { get; set; }
+        public Dictionary<string, string> albums { get; set; }
         public List<string> genres { get; set; }
         public string imageurl { get; set; }
         public string href { get; set; }
@@ -29,8 +29,8 @@ namespace iBase
     }
     public class Track
     {
-        public Album album { get; set; }
-        public List<Artist> artists { get; set; }
+        public string album { get; set; }
+        public Dictionary<string, string> artists { get; set; }
         public long disc_number { get; set; }
         public long duration_ms { get; set; }
         public bool explicity { get; set; }
