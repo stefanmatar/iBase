@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace iBase
 {
-    public class Album
+    public partial class AlbumTable
     {
         public string id { get; set; }
         public string name { get; set; }
@@ -15,7 +15,7 @@ namespace iBase
         public Dictionary<string, string> artists { get; set; }
         public Dictionary<string, string> tracks { get; set; }
     }
-    public class Artist
+    public partial class Artist
     {
         public long followers_total { get; set; }
         public Dictionary<string, string> albums { get; set; }

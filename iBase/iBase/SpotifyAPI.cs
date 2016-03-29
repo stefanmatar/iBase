@@ -10,41 +10,47 @@ namespace iBase
 {
     class SpotifyAPI
     {
+        iBaseDB iBase = new iBaseDB();
         public List<Artist> SearchArtists(string artistname)
         {
-            try
+            WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + artistname + "&type=artist");
+            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+            string json = reader.ReadToEnd();
+
+            var converter = new ExpandoObjectConverter();
+            dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+
+            List<Artist> ListOfArtists = new List<Artist>();
+
+            foreach (var tempartist in jsonobject.artists.items)
             {
-                WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + artistname + "&type=artist");
-                StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
-                string json = reader.ReadToEnd();
+                Artist artist = new Artist();
+                //artist.albums = tempartist.albums;
+                artist.followers_total = tempartist.followers.total;
+                //artist.genres = tempartist.genres.Cast<string>();
+                artist.href = tempartist.href;
+                artist.id = tempartist.id;
+                if (tempartist.images.Count > 1)
+                    artist.imageurl = tempartist.images[1].url;
+                artist.name = tempartist.name;
+                artist.popularity = tempartist.popularity;
+                artist.type = tempartist.type;
 
-                var converter = new ExpandoObjectConverter();
-                dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
+                ArtistTable t = new ArtistTable();
+                t.Id = artist.id;
+                t.Name = artist.name;
+                t.Href = artist.href;
+                t.FollowersTotal = artist.followers_total;
+                t.Popularity = artist.popularity;
+                t.Type = artist.type;
+                t.Genre = "";
+                iBase.ArtistTables.Add(t);
 
-                List<Artist> ListOfArtists = new List<Artist>();
+                ListOfArtists.Add(artist);
 
-                foreach (var tempartist in jsonobject.artists.items)
-                {
-                    Artist artist = new Artist();
-                    //artist.albums = tempartist.albums;
-                    artist.followers_total = tempartist.followers.total;
-                    //artist.genres = tempartist.genres.Cast<string>();
-                    artist.href = tempartist.href;
-                    artist.id = tempartist.id;
-                    if (tempartist.images.Count > 1)
-                        artist.imageurl = tempartist.images[1].url;
-                    artist.name = tempartist.name;
-                    artist.popularity = tempartist.popularity;
-                    artist.type = tempartist.type;
-
-                    ListOfArtists.Add(artist);
-                }
-                return ListOfArtists;
             }
-            catch (Exception)
-            {
-                return null;
-            }
+            iBase.SaveChanges();
+            return ListOfArtists;
         }
 
         public List<Track> SearchTracks(string trackname)
@@ -84,7 +90,7 @@ namespace iBase
                 return null;
             }
         }
-        public List<Album> SearchAlbums(string albumname)
+        public List<AlbumTable> SearchAlbums(string albumname)
         {
             try
             {
@@ -95,7 +101,7 @@ namespace iBase
                 var converter = new ExpandoObjectConverter();
                 dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
 
-                List<Album> ListOfAlbums = new List<Album>();
+                List<AlbumTable> ListOfAlbums = new List<AlbumTable>();
 
                 foreach (var tempalbum in jsonobject.albums.items)
                 {
@@ -111,7 +117,7 @@ namespace iBase
             }
         }
 
-        public Album GetAlbumFromID(string id)
+        public AlbumTable GetAlbumFromID(string id)
         {
             try
             {
@@ -122,7 +128,7 @@ namespace iBase
                 var converter = new ExpandoObjectConverter();
                 dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);
 
-                Album album = new Album();
+                AlbumTable album = new AlbumTable();
                 album.id = jsonobject.id;
                 album.href = jsonobject.href;
                 if (jsonobject.images.Count > 1)
@@ -180,6 +186,18 @@ namespace iBase
                 if (jsonobject.images.Count > 1)
                     artist.imageurl = jsonobject.images[1].url;
 
+                ArtistTable t = new ArtistTable();
+                t.Id = artist.id;
+                t.Name = artist.name;
+                t.Href = artist.href;
+                t.FollowersTotal = artist.followers_total;
+                t.Popularity = artist.popularity;
+                t.Type = artist.type;
+                if (artist.genres.Count > 0) t.Genre = artist.genres[0];
+                else t.Genre = "No Genre";
+                iBase.ArtistTables.Add(t);
+                iBase.SaveChanges();
+
                 return artist;
             }
             catch (Exception)
@@ -212,7 +230,6 @@ namespace iBase
                 track.imageurl = jsonobject.album.images[0].url;
                 track.track_number = jsonobject.track_number;
                 track.type = jsonobject.type;
-
 
                 Dictionary<string, string> artists = new Dictionary<string, string>();
                 foreach (var tempartist in jsonobject.artists)

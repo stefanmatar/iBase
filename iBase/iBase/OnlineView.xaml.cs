@@ -17,6 +17,7 @@ namespace iBase
 {
     public partial class OnlineView : UserControl
     {
+        SpotifyAPI spotify = new SpotifyAPI();
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
@@ -33,15 +34,14 @@ namespace iBase
         {
             string term = SearchTerm.Text;
             string type = SearchType.Text;
-            SpotifyAPI spotify = new SpotifyAPI();
             switch (type)
             {
                 case "Album":
                     InfoBox.Items.Clear();
-                    List<Album> albums = spotify.SearchAlbums(term);
+                    List<AlbumTable> albums = spotify.SearchAlbums(term);
 
                     if (albums != null)
-                        foreach (Album a in albums)
+                        foreach (AlbumTable a in albums)
                         {
                             TreeViewItem newChild = new TreeViewItem();
                             string header = a.name;
@@ -100,7 +100,7 @@ namespace iBase
                     else
                     {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = "No internet connection!";
+                        newChild.Header = "Artists null!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
@@ -136,8 +136,6 @@ namespace iBase
         {
             if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null)
             {
-                SpotifyAPI spotify = new SpotifyAPI();
-
                 TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
 
                 currentTrack = spotify.GetTrackFromID(item.Tag + "");
@@ -194,13 +192,7 @@ namespace iBase
                 StopPlayBack();
             }
             else if (e.Error != null)
-            {
                 PlayingStatus.Content = "Could not play track. Try again.";
-            }
-            else
-            {
-                // Everything completed normally.
-            }
         }
 
         void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -230,24 +222,12 @@ namespace iBase
             while (waveOut.PlaybackState == PlaybackState.Playing)
             {
                 Thread.Sleep(100);
-                try
-                {
-                    bgWorker.ReportProgress(5);
-                }
-                catch (Exception) { }
             }
             if (bgWorker.CancellationPending)
             {
-                // Set the e.Cancel flag so that the WorkerCompleted event
-                // knows that the process was cancelled.
                 e.Cancel = true;
-                bgWorker.ReportProgress(0);
                 return;
             }
-            try {
-                bgWorker.ReportProgress(100);
-            }
-            catch (Exception) { }
         }
         void ExitEvent(Object sender, RoutedEventArgs e)
         {

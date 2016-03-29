@@ -19,6 +19,7 @@ namespace iBase
     /// </summary>
     public partial class OfflineView : UserControl
     {
+        iBaseDB iBase = new iBaseDB();
         public OfflineView()
         {
             InitializeComponent();
@@ -51,6 +52,26 @@ namespace iBase
                 MiddleListBoxName.Items.Refresh();
             }
             */
+        }
+
+        private void OfflineView_Loaded(object sender, RoutedEventArgs e)
+        {
+            LeftListBoxName.ItemsSource = iBase.AlbumTables.ToList();
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch (TableSelection.Text)
+            {
+                case "Artist":
+                        LeftListBoxName.ItemsSource = iBase.AlbumTables.ToList();
+                    break;
+                case "Album":
+                    break;
+                case "Track":
+                    break;
+
+            }
         }
     }
 

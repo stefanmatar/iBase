@@ -73,6 +73,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -91,9 +93,45 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AlbumHasArtist.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AlbumHasTrack.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AlbumTable.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ArtistTable.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="iBaseDB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>iBaseDB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="iBaseDB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="iBaseDB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>iBaseDB.edmx</DependentUpon>
+    </Compile>
     <Compile Include="ObjectDumper.cs" />
     <Compile Include="SpotifyAPI.cs" />
     <Compile Include="SpotifyClasses.cs" />
+    <Compile Include="TrackHasArtist.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TracksHasArtist.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="TrackTable.cs">
+      <DependentUpon>iBaseDB.tt</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -139,6 +177,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EntityDeploy Include="iBaseDB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>iBaseDB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="iBaseDB.edmx.diagram">
+      <DependentUpon>iBaseDB.edmx</DependentUpon>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -152,6 +197,16 @@
   <ItemGroup>
     <Content Include="iBase.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="iBaseDB.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>iBaseDB.edmx</DependentUpon>
+      <LastGenOutput>iBaseDB.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="iBaseDB.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>iBaseDB.edmx</DependentUpon>
+      <LastGenOutput>iBaseDB.cs</LastGenOutput>
     </Content>
     <Content Include="iBase_log.ldf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -172,6 +227,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

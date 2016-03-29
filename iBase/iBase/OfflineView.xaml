@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
+        Loaded="OfflineView_Loaded"
         Height="430" Width="480">
-    <!-- Height and width must be deleted later! -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -17,14 +17,21 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ComboBox Grid.Column="0" Grid.Row="0"  Margin="3"/>
+        <ComboBox x:Name="TableSelection" Grid.Column="0" Grid.Row="0"  Margin="3" IsSynchronizedWithCurrentItem="True"  SelectionChanged="ComboBox_SelectionChanged" SelectedValuePath="Content">
+            <ComboBox.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#0C1419" />
+            </ComboBox.Resources>
+            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True" Foreground="White"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
+        </ComboBox>
         <Button Grid.Column="2" Grid.Row="0" Margin="3" Content="Search"/>
         <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
                         <TextBlock Text="{Binding Path=K_Bez}"></TextBlock>
-                        <TextBlock Text="{Binding Path=K_L_Klavst}"></TextBlock>
+                            <TextBlock Text="{Binding Path=K_L_Klavst}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
