@@ -38,5 +38,23 @@ namespace iBase
             var nc = new OfflineView();
             MainWindowSpace.Children.Add(nc);
         }
+
+        private void AllArtistsClick (object sender, RoutedEventArgs e) {
+            MainWindowSpace.Children.Clear();
+            var nc = new AllArtists();
+            MainWindowSpace.Children.Add(nc);
+        }
+
+        private void AllAlbumsClick (object sender, RoutedEventArgs e) {
+            MainWindowSpace.Children.Clear();
+            var nc = new OfflineView();
+            MainWindowSpace.Children.Add(nc);
+        }
+
+        private void AllTracksClick (object sender, RoutedEventArgs e) {
+            MainWindowSpace.Children.Clear();
+            var nc = new OfflineView();
+            MainWindowSpace.Children.Add(nc);
+        }
     }
 }

@@ -30,6 +30,11 @@
         <Label TextElement.Foreground="White" x:Name="SearchTypeLabel" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Search result for Album:</Label>
         <TreeView Background="#A9B1B8" Foreground="White" x:Name="InfoBox" Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
 	        SelectedItemChanged="InfoBox_SelectedItemChanged">
+            <!--<TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add" Click="Add_Click"></MenuItem>
+                </ContextMenu>
+            </TreeView.ContextMenu>-->
         </TreeView>
         <StackPanel TextElement.Foreground="White" x:Name="PlayerBox" Grid.Column="2" Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3">
             <DockPanel HorizontalAlignment="Stretch">

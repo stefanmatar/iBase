@@ -102,6 +102,15 @@
     <Compile Include="AlbumTable.cs">
       <DependentUpon>iBaseDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="AllAlbums.xaml.cs">
+      <DependentUpon>AllAlbums.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AllArtists.xaml.cs">
+      <DependentUpon>AllArtists.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="AllTracks.xaml.cs">
+      <DependentUpon>AllTracks.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ArtistTable.cs">
       <DependentUpon>iBaseDB.tt</DependentUpon>
     </Compile>
@@ -132,6 +141,18 @@
     <Compile Include="TrackTable.cs">
       <DependentUpon>iBaseDB.tt</DependentUpon>
     </Compile>
+    <Page Include="AllAlbums.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AllArtists.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AllTracks.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

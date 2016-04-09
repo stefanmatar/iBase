@@ -13,6 +13,13 @@
         <Menu TextElement.Foreground="White" DockPanel.Dock="Top" Background="Transparent">
             <MenuItem Header="Online" Click="OnlineMenuItemClick"/>
             <MenuItem Header="Offline" Click="OfflineMenuItemClick"/>
+            <MenuItem Header="More">
+                <MenuItem Header="Type">
+                    <MenuItem Header="Artists" Click="AllArtistsClick"/>
+                    <MenuItem Header="Albums" Click="AllAlbumsClick"/>
+                    <MenuItem Header="Tracks" Click="AllTracksClick"/>
+                </MenuItem>
+            </MenuItem>
         </Menu>
         <Grid TextElement.Foreground="White" x:Name="MainWindowSpace" />
         <!-- Effortless data binding:

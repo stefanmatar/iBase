@@ -26,6 +26,7 @@
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
         </ComboBox>
+        
         <Button Grid.Column="2" Grid.Row="0" Margin="3" Content="Search"/>
         <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
             <ListBox.ItemTemplate>
