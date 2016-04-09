@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,7 +16,6 @@ namespace iBase
 {
     public partial class OnlineView : UserControl
     {
-        SpotifyAPI spotify = new SpotifyAPI();
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
@@ -38,7 +36,7 @@ namespace iBase
             {
                 case "Album":
                     InfoBox.Items.Clear();
-                    List<AlbumTable> albums = spotify.SearchAlbums(term);
+                    List<AlbumTable> albums = SpotifyAPI.SearchAlbums(term);
 
                     if (albums != null)
                         foreach (AlbumTable a in albums)
@@ -86,7 +84,7 @@ namespace iBase
                     break;
                 case "Artist":
                     InfoBox.Items.Clear();
-                    List<Artist> artists = spotify.SearchArtists(term);
+                    List<Artist> artists = SpotifyAPI.SearchArtists(term);
 
                     if (artists != null)
                         foreach (Artist a in artists)
@@ -106,7 +104,7 @@ namespace iBase
                     break;
                 case "Track":
                     InfoBox.Items.Clear();
-                    List<Track> tracks = spotify.SearchTracks(term);
+                    List<Track> tracks = SpotifyAPI.SearchTracks(term);
                     if (tracks != null)
                         foreach (Track track in tracks)
                         {
@@ -138,9 +136,11 @@ namespace iBase
             {
                 TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
 
-                currentTrack = spotify.GetTrackFromID(item.Tag + "");
-
-                PlayCurrentTrack();
+                if (item != null)
+                {
+                    currentTrack = SpotifyAPI.GetTrackFromID(item.Tag + "");
+                    PlayCurrentTrack();
+                }
             }
         }
 
@@ -241,6 +241,11 @@ namespace iBase
             {
                 PlayCurrentTrack();
             }
+        }
+
+        private void SearchTerm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter || e.Key == Key.Tab) Search() ; 
         }
     }
     public class ActionCommand : ICommand

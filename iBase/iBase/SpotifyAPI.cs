@@ -5,13 +5,14 @@ using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Dynamic;
+using System.Linq;
 
 namespace iBase
 {
-    class SpotifyAPI
+    public static class SpotifyAPI
     {
-        iBaseDB iBase = new iBaseDB();
-        public List<Artist> SearchArtists(string artistname)
+        static iBaseDB iBase = new iBaseDB();
+        public static List<Artist> SearchArtists(string artistname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + artistname + "&type=artist");
             StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
@@ -36,24 +37,25 @@ namespace iBase
                 artist.popularity = tempartist.popularity;
                 artist.type = tempartist.type;
 
-                ArtistTable t = new ArtistTable();
-                t.Id = artist.id;
-                t.Name = artist.name;
-                t.Href = artist.href;
-                t.FollowersTotal = artist.followers_total;
-                t.Popularity = artist.popularity;
-                t.Type = artist.type;
-                t.Genre = "";
-                iBase.ArtistTables.Add(t);
-
+                if (!iBase.ArtistTables.Any(x => x.Id == artist.id))
+                {
+                    ArtistTable t = new ArtistTable();
+                    t.Id = artist.id;
+                    t.Name = artist.name;
+                    t.Href = artist.href;
+                    t.Genre = "";
+                    t.FollowersTotal = artist.followers_total;
+                    t.Popularity = artist.popularity;
+                    t.Type = artist.type;
+                    iBase.ArtistTables.Add(t);
+                    iBase.SaveChanges();
+                }
                 ListOfArtists.Add(artist);
-
             }
-            iBase.SaveChanges();
             return ListOfArtists;
         }
 
-        public List<Track> SearchTracks(string trackname)
+        public static List<Track> SearchTracks(string trackname)
         {
             try
             {
@@ -90,7 +92,7 @@ namespace iBase
                 return null;
             }
         }
-        public List<AlbumTable> SearchAlbums(string albumname)
+        public static List<AlbumTable> SearchAlbums(string albumname)
         {
             try
             {
@@ -117,7 +119,7 @@ namespace iBase
             }
         }
 
-        public AlbumTable GetAlbumFromID(string id)
+        public static AlbumTable GetAlbumFromID(string id)
         {
             try
             {
@@ -158,7 +160,7 @@ namespace iBase
             }
         }
 
-        public Artist GetArtistFromID(string id)
+        public static Artist GetArtistFromID(string id)
         {
             try
             {
@@ -206,7 +208,7 @@ namespace iBase
             }
         }
 
-        public Track GetTrackFromID(string id)
+        public static Track GetTrackFromID(string id)
         {
             try
             {
@@ -246,7 +248,7 @@ namespace iBase
             }
         }
 
-        public Dictionary<string, string> GetArtistsAlbums(string id)
+        public static Dictionary<string, string> GetArtistsAlbums(string id)
         {
             try
             {
