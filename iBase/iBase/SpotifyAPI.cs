@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Dynamic;
 using System.Linq;
+using System.Windows;
 
 namespace iBase
 {
@@ -15,8 +16,15 @@ namespace iBase
         public static List<Artist> SearchArtists(string artistname)
         {
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + artistname + "&type=artist");
-            StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
-            string json = reader.ReadToEnd();
+            string json = "";
+            try {
+                StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
+                json = reader.ReadToEnd();
+            }
+            catch (Exception e) {
+                MessageBox.Show("Error: "+e.Message);
+                return null;
+            }
 
             var converter = new ExpandoObjectConverter();
             dynamic jsonobject = JsonConvert.DeserializeObject<ExpandoObject>(json, converter);

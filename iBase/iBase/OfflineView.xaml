@@ -17,6 +17,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        
         <ComboBox x:Name="TableSelection" Grid.Column="0" Grid.Row="0"  Margin="3" IsSynchronizedWithCurrentItem="True"  SelectionChanged="ComboBox_SelectionChanged" SelectedValuePath="Content">
             <ComboBox.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#0C1419" />
