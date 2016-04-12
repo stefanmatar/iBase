@@ -47,13 +47,13 @@ namespace iBase
 
         private void AllAlbumsClick (object sender, RoutedEventArgs e) {
             MainWindowSpace.Children.Clear();
-            var nc = new OfflineView();
+            var nc = new AllAlbums();
             MainWindowSpace.Children.Add(nc);
         }
 
         private void AllTracksClick (object sender, RoutedEventArgs e) {
             MainWindowSpace.Children.Clear();
-            var nc = new OfflineView();
+            var nc = new AllTracks();
             MainWindowSpace.Children.Add(nc);
         }
     }
