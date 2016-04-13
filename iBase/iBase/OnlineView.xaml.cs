@@ -11,12 +11,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
 namespace iBase
 {
     public partial class OnlineView : UserControl
     {
         SpotifyAPI spotify = new SpotifyAPI();
+        iBaseDB db = new iBaseDB();
+
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
@@ -37,58 +38,46 @@ namespace iBase
             {
                 case "Album":
                     InfoBox.Items.Clear();
-                    try
-                    {
-                        List<AlbumTable> albums = spotify.SearchAlbums(term);
-                        if (albums != null)
-                            foreach (AlbumTable a in albums)
-                            {
-                                TreeViewItem newChild = new TreeViewItem();
-                                string header = a.name;
-                                newChild.Tag = a.id;
-
-                                List<string> albumitems = new List<string>();
-
-                                List<string> tracksList = new List<string>(a.tracks.Keys);
-                                if (tracksList.Count > 0)
-                                {
-                                    albumitems.Add("Tracks:");
-                                    foreach (string trackname in tracksList.ToList())
-                                    {
-                                        albumitems.Add("- " + trackname);
-                                    }
-                                }
-                                string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
-
-                                if (artistsList.Length == 1)
-                                {
-                                    header += " by " + artistsList[0];
-                                }
-                                else if (artistsList.Length > 1)
-                                {
-                                    albumitems.Add("Artists:");
-                                    foreach (string artistname in artistsList)
-                                    {
-                                        albumitems.Add("- " + artistname);
-                                    }
-                                }
-                                newChild.Header = header;
-
-                                newChild.ItemsSource = albumitems;
-                                InfoBox.Items.Add(newChild);
-                            }
-                        else
+                    List<AlbumTable> albums = spotify.SearchAlbums(term);
+                    if (albums != null)
+                        foreach (AlbumTable a in albums)
                         {
                             TreeViewItem newChild = new TreeViewItem();
-                            newChild.Header = "No internet connection!";
+                            string header = a.name;
+                            newChild.Tag = a.id;
+                            List<string> albumitems = new List<string>();
+                            List<string> tracksList = new List<string>(a.tracks.Keys);
+                            if (tracksList.Count > 0)
+                            {
+                                albumitems.Add("Tracks:");
+                                foreach (string trackname in tracksList.ToList())
+                                {
+                                    albumitems.Add("- " + trackname);
+                                }
+                            }
+                            string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
+                            if (artistsList.Length == 1)
+                            {
+                                header += " by " + artistsList[0];
+                            }
+                            else if (artistsList.Length > 1)
+                            {
+                                albumitems.Add("Artists:");
+                                foreach (string artistname in artistsList)
+                                {
+                                    albumitems.Add("- " + artistname);
+                                }
+                            }
+                            newChild.Header = header;
+
+                            newChild.ItemsSource = albumitems;
                             InfoBox.Items.Add(newChild);
                         }
+                    else {
+                        TreeViewItem newChild = new TreeViewItem();
+                        newChild.Header = "No internet connection!";
+                        InfoBox.Items.Add(newChild);
                     }
-                    catch (Exception e)
-                    {
-                        MessageBox.Show("Exception: " + e.InnerException);
-                    }
-
                     break;
                 case "Artist":
                     InfoBox.Items.Clear();
@@ -103,8 +92,7 @@ namespace iBase
                             newChild.ItemsSource = new string[] { "Follower: " + a.followers_total, "Link: " + a.href, "Typ: " + a.type, "Popularity: " + a.popularity + "/100" };
                             InfoBox.Items.Add(newChild);
                         }
-                    else
-                    {
+                    else {
                         TreeViewItem newChild = new TreeViewItem();
                         newChild.Header = "Artists null!";
                         InfoBox.Items.Add(newChild);
@@ -123,8 +111,7 @@ namespace iBase
                             newChild.ItemsSource = new string[] { "Disk number: " + track.disc_number, "Track number: " + track.track_number, "Explicity: " + track.explicity, "Duration: " + String.Format("{0}:{1:D2}", t.Minutes, t.Seconds), "Album:" + track.album, "Link: " + track.href, "Typ: " + track.type, "Popularity: " + track.popularity + "/100" };
                             InfoBox.Items.Add(newChild);
                         }
-                    else
-                    {
+                    else {
                         TreeViewItem newChild = new TreeViewItem();
                         newChild.Header = "No internet connection!";
                         InfoBox.Items.Add(newChild);
@@ -143,7 +130,6 @@ namespace iBase
             if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null)
             {
                 TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
-
                 if (item != null)
                 {
                     currentTrack = spotify.GetTrackFromID(item.Tag + "");
@@ -254,25 +240,58 @@ namespace iBase
                 PlayCurrentTrack();
             }
         }
-
         private void SearchTerm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter || e.Key == Key.Tab) Search();
         }
-    }
-    public class ActionCommand
-    {
-        private readonly Action _action;
 
-
-        public ActionCommand(Action action)
+        public class ActionCommand : ICommand
         {
-            _action = action;
+            private readonly Action _action;
+
+            public ActionCommand(Action action)
+            {
+                _action = action;
+            }
+
+            public void Execute(object parameter)
+            {
+                _action();
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
+
+            public event EventHandler CanExecuteChanged;
         }
-
-        public void Execute(object parameter)
+        public IEnumerable<ArtistTable> AllArt
         {
-            _action();
+            get
+            {
+                return
+                    (from d in db.ArtistTables
+                     select d).ToList();
+            }
+        }
+        public IEnumerable<AlbumTable> AllAlbs
+        {
+            get
+            {
+                return
+                    (from d in db.AlbumTables
+                     select d).ToList();
+            }
+        }
+        public IEnumerable<TrackTable> AllTracks
+        {
+            get
+            {
+                return
+                    (from d in db.TrackTables
+                     select d).ToList();
+            }
         }
     }
 }

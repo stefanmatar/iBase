@@ -124,12 +124,13 @@ namespace iBase
             foreach (var album in jsonobject.albums.items)
             {
                 ListOfAlbums.Add(GetAlbumFromID(album.id));
+                string tempid = album.id;
 
-                AlbumTable a = new AlbumTable();
-                a.Id = album.id;
-
-                if (!iBase.AlbumTables.Any(x => x.Id == a.id))
+                if (!iBase.AlbumTables.Any(x => x.Id == tempid))
                 {
+                    AlbumTable a = new AlbumTable();
+                    a.Id = album.id;
+
                     a.Name = album.name;
                     a.Href = album.href;
                     a.ImageURL = album.ImageURL;
