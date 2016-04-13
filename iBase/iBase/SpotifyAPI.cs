@@ -130,10 +130,10 @@ namespace iBase
 
                 if (!iBase.AlbumTables.Any(x => x.Id == a.id))
                 {
-                    iBase.AlbumTables.Add(a);
                     a.Name = album.name;
                     a.Href = album.href;
                     a.ImageURL = album.ImageURL;
+                    iBase.AlbumTables.Add(a);
                     iBase.SaveChanges();
                 }
             }
