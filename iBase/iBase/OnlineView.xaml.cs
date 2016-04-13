@@ -16,6 +16,7 @@ namespace iBase
 {
     public partial class OnlineView : UserControl
     {
+        SpotifyAPI spotify = new SpotifyAPI();
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
@@ -36,55 +37,62 @@ namespace iBase
             {
                 case "Album":
                     InfoBox.Items.Clear();
-                    List<AlbumTable> albums = SpotifyAPI.SearchAlbums(term);
+                    try
+                    {
+                        List<AlbumTable> albums = spotify.SearchAlbums(term);
+                        if (albums != null)
+                            foreach (AlbumTable a in albums)
+                            {
+                                TreeViewItem newChild = new TreeViewItem();
+                                string header = a.name;
+                                newChild.Tag = a.id;
 
-                    if (albums != null)
-                        foreach (AlbumTable a in albums)
+                                List<string> albumitems = new List<string>();
+
+                                List<string> tracksList = new List<string>(a.tracks.Keys);
+                                if (tracksList.Count > 0)
+                                {
+                                    albumitems.Add("Tracks:");
+                                    foreach (string trackname in tracksList.ToList())
+                                    {
+                                        albumitems.Add("- " + trackname);
+                                    }
+                                }
+                                string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
+
+                                if (artistsList.Length == 1)
+                                {
+                                    header += " by " + artistsList[0];
+                                }
+                                else if (artistsList.Length > 1)
+                                {
+                                    albumitems.Add("Artists:");
+                                    foreach (string artistname in artistsList)
+                                    {
+                                        albumitems.Add("- " + artistname);
+                                    }
+                                }
+                                newChild.Header = header;
+
+                                newChild.ItemsSource = albumitems;
+                                InfoBox.Items.Add(newChild);
+                            }
+                        else
                         {
                             TreeViewItem newChild = new TreeViewItem();
-                            string header = a.name;
-                            newChild.Tag = a.id;
-
-                            List<string> albumitems = new List<string>();
-
-                            List<string> tracksList = new List<string>(a.tracks.Keys);
-                            if (tracksList.Count > 0)
-                            {
-                                albumitems.Add("Tracks:");
-                                foreach (string trackname in tracksList.ToList())
-                                {
-                                    albumitems.Add("- " + trackname);
-                                }
-                            }
-                            string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
-
-                            if (artistsList.Length == 1)
-                            {
-                                header += " by " + artistsList[0];
-                            }
-                            else if (artistsList.Length > 1)
-                            {
-                                albumitems.Add("Artists:");
-                                foreach (string artistname in artistsList)
-                                {
-                                    albumitems.Add("- " + artistname);
-                                }
-                            }
-                            newChild.Header = header;
-
-                            newChild.ItemsSource = albumitems;
+                            newChild.Header = "No internet connection!";
                             InfoBox.Items.Add(newChild);
                         }
-                    else
-                    {
-                        TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = "No internet connection!";
-                        InfoBox.Items.Add(newChild);
                     }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("Exception: " + e.InnerException);
+                    }
+
                     break;
                 case "Artist":
                     InfoBox.Items.Clear();
-                    List<Artist> artists = SpotifyAPI.SearchArtists(term);
+                    List<Artist> artists = spotify.SearchArtists(term);
 
                     if (artists != null)
                         foreach (Artist a in artists)
@@ -104,7 +112,7 @@ namespace iBase
                     break;
                 case "Track":
                     InfoBox.Items.Clear();
-                    List<Track> tracks = SpotifyAPI.SearchTracks(term);
+                    List<Track> tracks = spotify.SearchTracks(term);
                     if (tracks != null)
                         foreach (Track track in tracks)
                         {
@@ -138,8 +146,8 @@ namespace iBase
 
                 if (item != null)
                 {
-                    currentTrack = SpotifyAPI.GetTrackFromID(item.Tag + "");
-                    PlayCurrentTrack();
+                    currentTrack = spotify.GetTrackFromID(item.Tag + "");
+                    if (currentTrack != null) PlayCurrentTrack();
                 }
             }
         }
@@ -147,8 +155,12 @@ namespace iBase
         public void PlayCurrentTrack()
         {
             StopPlayBack();
-            Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
+            if (currentTrack != null)
+            {
+                Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
 
+
+            }
             bgWorker = new BackgroundWorker();
             bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
             bgWorker.ProgressChanged += new ProgressChangedEventHandler(bgWorker_ProgressChanged);
@@ -245,12 +257,13 @@ namespace iBase
 
         private void SearchTerm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter || e.Key == Key.Tab) Search() ; 
+            if (e.Key == Key.Enter || e.Key == Key.Tab) Search();
         }
     }
-    public class ActionCommand : ICommand
+    public class ActionCommand
     {
         private readonly Action _action;
+
 
         public ActionCommand(Action action)
         {
@@ -261,12 +274,5 @@ namespace iBase
         {
             _action();
         }
-
-        public bool CanExecute(object parameter)
-        {
-            return true;
-        }
-
-        public event EventHandler CanExecuteChanged;
     }
 }
