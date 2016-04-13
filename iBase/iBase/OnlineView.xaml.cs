@@ -11,51 +11,60 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+namespace iBase
+{
+    public partial class OnlineView : UserControl
+    {
+        SpotifyAPI spotify = new SpotifyAPI();
+        iBaseDB db = new iBaseDB();
 
-namespace iBase {
-    public partial class OnlineView : UserControl {
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
         private MediaPlayer mediaPlayer = new MediaPlayer();
 
-        public OnlineView () {
+        public OnlineView()
+        {
             InitializeComponent();
             Stop.IsEnabled = false;
             Unloaded += ExitEvent;
         }
 
-        private void Search () {
+        private void Search()
+        {
             string term = SearchTerm.Text;
             string type = SearchType.Text;
-            switch (type) {
+            switch (type)
+            {
                 case "Album":
                     InfoBox.Items.Clear();
-                    List<AlbumTable> albums = SpotifyAPI.SearchAlbums(term);
-
+                    List<AlbumTable> albums = spotify.SearchAlbums(term);
                     if (albums != null)
-                        foreach (AlbumTable a in albums) {
+                        foreach (AlbumTable a in albums)
+                        {
                             TreeViewItem newChild = new TreeViewItem();
                             string header = a.name;
                             newChild.Tag = a.id;
-
                             List<string> albumitems = new List<string>();
-
                             List<string> tracksList = new List<string>(a.tracks.Keys);
-                            if (tracksList.Count > 0) {
+                            if (tracksList.Count > 0)
+                            {
                                 albumitems.Add("Tracks:");
-                                foreach (string trackname in tracksList.ToList()) {
+                                foreach (string trackname in tracksList.ToList())
+                                {
                                     albumitems.Add("- " + trackname);
                                 }
                             }
                             string[] artistsList = (new List<string>(a.artists.Keys)).Select(i => i.ToString()).ToArray();
-
-                            if (artistsList.Length == 1) {
+                            if (artistsList.Length == 1)
+                            {
                                 header += " by " + artistsList[0];
                             }
-                            else if (artistsList.Length > 1) {
+                            else if (artistsList.Length > 1)
+                            {
                                 albumitems.Add("Artists:");
-                                foreach (string artistname in artistsList) {
+                                foreach (string artistname in artistsList)
+                                {
                                     albumitems.Add("- " + artistname);
                                 }
                             }
@@ -72,10 +81,11 @@ namespace iBase {
                     break;
                 case "Artist":
                     InfoBox.Items.Clear();
-                    List<Artist> artists = SpotifyAPI.SearchArtists(term);
+                    List<Artist> artists = spotify.SearchArtists(term);
 
                     if (artists != null)
-                        foreach (Artist a in artists) {
+                        foreach (Artist a in artists)
+                        {
                             TreeViewItem newChild = new TreeViewItem();
                             newChild.Header = a.name;
                             newChild.Tag = a.id;
@@ -90,9 +100,10 @@ namespace iBase {
                     break;
                 case "Track":
                     InfoBox.Items.Clear();
-                    List<Track> tracks = SpotifyAPI.SearchTracks(term);
+                    List<Track> tracks = spotify.SearchTracks(term);
                     if (tracks != null)
-                        foreach (Track track in tracks) {
+                        foreach (Track track in tracks)
+                        {
                             TreeViewItem newChild = new TreeViewItem();
                             newChild.Header = track.name;
                             newChild.Tag = track.id;
@@ -109,25 +120,33 @@ namespace iBase {
             }
         }
 
-        private void Search_Click (object sender, RoutedEventArgs e) {
+        private void Search_Click(object sender, RoutedEventArgs e)
+        {
             Search();
         }
 
-        private void InfoBox_SelectedItemChanged (object sender, RoutedPropertyChangedEventArgs<object> e) {
-            if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null) {
+        private void InfoBox_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (SearchType.SelectedValue.Equals("Track") && InfoBox.SelectedItem != null)
+            {
                 TreeViewItem item = InfoBox.SelectedItem as TreeViewItem;
-
-                if (item != null) {
-                    currentTrack = SpotifyAPI.GetTrackFromID(item.Tag + "");
-                    PlayCurrentTrack();
+                if (item != null)
+                {
+                    currentTrack = spotify.GetTrackFromID(item.Tag + "");
+                    if (currentTrack != null) PlayCurrentTrack();
                 }
             }
         }
 
-        public void PlayCurrentTrack () {
+        public void PlayCurrentTrack()
+        {
             StopPlayBack();
-            Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
+            if (currentTrack != null)
+            {
+                Icon.Source = new BitmapImage(new Uri(currentTrack.imageurl, UriKind.Absolute));
 
+
+            }
             bgWorker = new BackgroundWorker();
             bgWorker.DoWork += new DoWorkEventHandler(bgWorker_DoWork);
             bgWorker.ProgressChanged += new ProgressChangedEventHandler(bgWorker_ProgressChanged);
@@ -139,19 +158,23 @@ namespace iBase {
             bgWorker.RunWorkerAsync(currentTrack.preview_url);
         }
 
-        private void SearchType_SelectionChanged (object sender, SelectionChangedEventArgs e) {
+        private void SearchType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
             if (SearchType != null && SearchTerm != null)
                 SearchTypeLabel.Content = "Search result for " + SearchType.SelectedValue + ":";
             else if (SearchTypeLabel != null)
                 SearchTypeLabel.Content = "Search result for Album:";
         }
 
-        private void Stop_Click (object sender, RoutedEventArgs e) {
+        private void Stop_Click(object sender, RoutedEventArgs e)
+        {
             StopPlayBack();
         }
 
-        public void StopPlayBack () {
-            if (bgWorker != null && bgWorker.IsBusy) {
+        public void StopPlayBack()
+        {
+            if (bgWorker != null && bgWorker.IsBusy)
+            {
                 bgWorker.CancelAsync();
             }
             if (waveOut != null)
@@ -159,8 +182,10 @@ namespace iBase {
             Stop.IsEnabled = false;
         }
 
-        void bgWorker_RunWorkerCompleted (object sender, RunWorkerCompletedEventArgs e) {
-            if (e.Cancelled) {
+        void bgWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
                 PlayingStatus.Content = "Nothing playing.";
                 StopPlayBack();
             }
@@ -168,18 +193,21 @@ namespace iBase {
                 PlayingStatus.Content = "Could not play track. Try again.";
         }
 
-        void bgWorker_ProgressChanged (object sender, ProgressChangedEventArgs e) {
+        void bgWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
             PlayingStatus.Content = "Playing: " + currentTrack.name;
         }
 
-        void bgWorker_DoWork (object sender, DoWorkEventArgs e) {
+        void bgWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
             string url = e.Argument + "";
             Stream ms = new MemoryStream();
             Stream stream = WebRequest.Create(url)
                     .GetResponse().GetResponseStream();
             byte[] buffer = new byte[32768];
             int read;
-            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0) {
+            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+            {
                 ms.Write(buffer, 0, read);
             }
 
@@ -189,63 +217,77 @@ namespace iBase {
             waveOut.Init(blockAlignedStream);
             waveOut.Play();
 
-            while (waveOut.PlaybackState == PlaybackState.Playing) {
+            while (waveOut.PlaybackState == PlaybackState.Playing)
+            {
                 Thread.Sleep(100);
             }
-            if (bgWorker.CancellationPending) {
+            if (bgWorker.CancellationPending)
+            {
                 e.Cancel = true;
                 return;
             }
         }
-        void ExitEvent (Object sender, RoutedEventArgs e) {
+        void ExitEvent(Object sender, RoutedEventArgs e)
+        {
             Loaded -= ExitEvent;
             StopPlayBack();
         }
 
-        private void Play_Click (object sender, RoutedEventArgs e) {
-            if (currentTrack != null) {
+        private void Play_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentTrack != null)
+            {
                 PlayCurrentTrack();
             }
         }
-
-        private void SearchTerm_KeyDown (object sender, KeyEventArgs e) {
+        private void SearchTerm_KeyDown(object sender, KeyEventArgs e)
+        {
             if (e.Key == Key.Enter || e.Key == Key.Tab) Search();
         }
 
-        public class ActionCommand : ICommand {
+        public class ActionCommand : ICommand
+        {
             private readonly Action _action;
 
-            public ActionCommand (Action action) {
+            public ActionCommand(Action action)
+            {
                 _action = action;
             }
 
-            public void Execute (object parameter) {
+            public void Execute(object parameter)
+            {
                 _action();
             }
 
-            public bool CanExecute (object parameter) {
+            public bool CanExecute(object parameter)
+            {
                 return true;
             }
 
             public event EventHandler CanExecuteChanged;
         }
-        iBaseDB db = new iBaseDB();
-        public IEnumerable<ArtistTable> AllArt {
-            get {
+        public IEnumerable<ArtistTable> AllArt
+        {
+            get
+            {
                 return
                     (from d in db.ArtistTables
                      select d).ToList();
             }
         }
-        public IEnumerable<AlbumTable> AllAlbs {
-            get {
+        public IEnumerable<AlbumTable> AllAlbs
+        {
+            get
+            {
                 return
                     (from d in db.AlbumTables
                      select d).ToList();
             }
         }
-        public IEnumerable<TrackTable> AllTracks {
-            get {
+        public IEnumerable<TrackTable> AllTracks
+        {
+            get
+            {
                 return
                     (from d in db.TrackTables
                      select d).ToList();

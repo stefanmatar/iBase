@@ -25,7 +25,7 @@
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track"/>
         </ComboBox>
-        <TextBox Background="#182933" Foreground="White" x:Name="SearchTerm" KeyDown="SearchTerm_KeyDown" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="3"/>
+        <TextBox Background="#182933" Foreground="White" x:Name="SearchTerm" KeyDown="SearchTerm_KeyDown" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Margin="3" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
         <Button Grid.Row="0" Grid.Column="3" Foreground="White" Click="Search_Click" Background="#182933" Content="Search" HorizontalAlignment="Stretch" Margin="3"/>
         <Label TextElement.Foreground="White" x:Name="SearchTypeLabel" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Search result for Album:</Label>
         <TreeView Background="#A9B1B8" Foreground="White" x:Name="InfoBox" Grid.Column="0" Grid.Row="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="3"
