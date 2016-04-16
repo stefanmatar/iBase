@@ -5,13 +5,13 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="6ea51a3691604839b4a01aeef5204e8a" Name="Diagram1">
-        <EntityTypeShape EntityType="iBaseModel.AlbumHasArtist" Width="1.5" PointX="3" PointY="3.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.AlbumHasTrack" Width="1.5" PointX="5.25" PointY="8.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.AlbumTable" Width="1.5" PointX="0.75" PointY="1.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.ArtistTable" Width="1.5" PointX="0.75" PointY="4.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.TrackHasArtist" Width="1.5" PointX="5.25" PointY="5.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.TracksHasArtist" Width="1.5" PointX="8.25" PointY="7.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="iBaseModel.TrackTable" Width="1.5" PointX="3" PointY="7" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.AlbumHasArtist" Width="1.5" PointX="0.5" PointY="3.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.AlbumHasTrack" Width="1.5" PointX="4.75" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.AlbumTable" Width="1.5" PointX="0.5" PointY="0.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.ArtistTable" Width="1.5" PointX="0.5" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.TrackHasArtist" Width="1.5" PointX="4.75" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.TracksHasArtist" Width="1.5" PointX="4.875" PointY="6.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="iBaseModel.TrackTable" Width="1.5" PointX="9.5" PointY="3.375" IsExpanded="true" />
         <AssociationConnector Association="iBaseModel.FK_AlbumHasArtist_Album" ManuallyRouted="false" />
         <AssociationConnector Association="iBaseModel.FK_AlbumHasArtist_Artist" ManuallyRouted="false" />
         <AssociationConnector Association="iBaseModel.FK_AlbumHasTracks_Album" ManuallyRouted="false" />

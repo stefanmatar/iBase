@@ -56,7 +56,8 @@ namespace iBase
 
         private void OfflineView_Loaded(object sender, RoutedEventArgs e)
         {
-            LeftListBoxName.ItemsSource = iBase.AlbumTables.ToList();
+            LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
+            /*TO DO: Alphabetical sorting of LeftListBox*/
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -64,7 +65,7 @@ namespace iBase
             switch (TableSelection.Text)
             {
                 case "Artist":
-                        LeftListBoxName.ItemsSource = iBase.AlbumTables.ToList();
+                    LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
                     break;
                 case "Album":
                     break;

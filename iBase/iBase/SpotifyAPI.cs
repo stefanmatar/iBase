@@ -112,6 +112,7 @@ namespace iBase
         }
         public List<AlbumTable> SearchAlbums(string albumname)
         {
+            if (albumname == String.Empty || albumname == null) return null;
             WebRequest request = WebRequest.Create("https://api.spotify.com/v1/search?q=" + albumname + "&offset=0&limit=50&type=album");
             StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream());
             string json = reader.ReadToEnd();
@@ -138,9 +139,7 @@ namespace iBase
                     iBase.SaveChanges();
                 }
             }
-
             return ListOfAlbums;
-
         }
 
         public AlbumTable GetAlbumFromID(string id)

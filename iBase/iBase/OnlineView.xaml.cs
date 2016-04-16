@@ -75,7 +75,7 @@ namespace iBase
                         }
                     else {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = "No internet connection!";
+                        newChild.Header = "No search term or internet!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
@@ -94,7 +94,7 @@ namespace iBase
                         }
                     else {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = "Artists null!";
+                        newChild.Header = "No search term or internet!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
@@ -113,7 +113,7 @@ namespace iBase
                         }
                     else {
                         TreeViewItem newChild = new TreeViewItem();
-                        newChild.Header = "No internet connection!";
+                        newChild.Header = "No search term or internet!";
                         InfoBox.Items.Add(newChild);
                     }
                     break;
