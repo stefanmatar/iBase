@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
+        MinHeight="500" MinWidth="500"
+        MaxHeight="800" MaxWidth="800"
         mc:Ignorable="d"
-        Loaded="OfflineView_Loaded"
-        Height="430" Width="480">
+        Loaded="OfflineView_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -17,7 +18,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
+
         <ComboBox x:Name="TableSelection" Grid.Column="0" Grid.Row="0"  Margin="3" IsSynchronizedWithCurrentItem="True"  SelectionChanged="ComboBox_SelectionChanged" SelectedValuePath="Content">
             <ComboBox.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#0C1419" />
@@ -26,21 +27,20 @@
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
         </ComboBox>
-        
+
         <Button Grid.Column="2" Grid.Row="0" Margin="3" Content="Search"/>
-        <ListBox x:Name="LeftListBoxName" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
+        <ListBox x:Name="LeftListBox" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
-                        <TextBlock Text="{Binding Path=K_Bez}"></TextBlock>
-                            <TextBlock Text="{Binding Path=K_L_Klavst}"></TextBlock>
+                        <TextBlock Text="{Binding Path=Name}"></TextBlock>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
         <ListBox x:Name="MiddleListBoxName" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="3"
-                 ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}"
                  DisplayMemberPath="S_Name">
+            <!--ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}"-->
         </ListBox>
         <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
             <TextBlock Text="{Binding Path=Artist_Name}" Margin="3"/>

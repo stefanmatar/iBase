@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:iBase"
         mc:Ignorable="d"
-        ResizeMode="NoResize"
-        Title="iBase" Height="500" Width="500"
+        Title="iBase"
+        MinHeight="500" MinWidth="500"
+        MaxHeight="800" MaxWidth="800"
         Background="#132028"
         UseLayoutRounding="True">
     <DockPanel>
