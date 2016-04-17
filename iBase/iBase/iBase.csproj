@@ -130,6 +130,7 @@
       <DependentUpon>iBaseDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="ObjectDumper.cs" />
+    <Compile Include="OfflineData.cs" />
     <Compile Include="SpotifyAPI.cs" />
     <Compile Include="SpotifyClasses.cs" />
     <Compile Include="TrackHasArtist.cs">

@@ -18,6 +18,7 @@ namespace iBase
         SpotifyAPI spotify = new SpotifyAPI();
         iBaseDB db = new iBaseDB();
 
+
         private Track currentTrack { get; set; }
         public WaveOut waveOut { get; set; }
         public BackgroundWorker bgWorker;
@@ -265,33 +266,6 @@ namespace iBase
             }
 
             public event EventHandler CanExecuteChanged;
-        }
-        public IEnumerable<ArtistTable> AllArt
-        {
-            get
-            {
-                return
-                    (from d in db.ArtistTables
-                     select d).ToList();
-            }
-        }
-        public IEnumerable<AlbumTable> AllAlbs
-        {
-            get
-            {
-                return
-                    (from d in db.AlbumTables
-                     select d).ToList();
-            }
-        }
-        public IEnumerable<TrackTable> AllTracks
-        {
-            get
-            {
-                return
-                    (from d in db.TrackTables
-                     select d).ToList();
-            }
         }
     }
 }

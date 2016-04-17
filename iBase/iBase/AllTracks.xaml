@@ -6,8 +6,14 @@
              xmlns:local="clr-namespace:iBase"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <ObjectDataProvider x:Key="data" ObjectType="{x:Type local:OfflineData}"/>
+    </UserControl.Resources>
+
     <Grid>
-        <DataGrid Name="ArtistsGrid">
+        <DataGrid Name="ArtistsGrid" ItemsSource="{Binding AllTracks, Source={StaticResource data}}"
+                  AutoGenerateColumns="False" MaxColumnWidth="150">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Path=Id}"/>
                 <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}"/>
@@ -38,12 +44,12 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock Text="ID: " FontWeight="Bold" />
-                            <TextBlock Text="{Binding Id}" Grid.Column="1" />
-                            <TextBlock Text="Name: " FontWeight="Bold" Grid.Row="1" />
-                            <TextBlock Text="{Binding Name}" Grid.Column="1" Grid.Row="1" />
-                            <TextBlock Text="Birthday: " FontWeight="Bold" Grid.Row="2" />
-                            <TextBlock Text="{Binding Genre}" Grid.Column="1" Grid.Row="2" />
+                            <TextBlock Text="Name: " FontWeight="Bold" />
+                            <TextBlock Text="{Binding Name}" Grid.Column="1" />
+                            <TextBlock Text="Album: " FontWeight="Bold" Grid.Row="1" />
+                            <TextBlock Text="{Binding Album}" Grid.Column="1" Grid.Row="1" />
+                            <TextBlock Text="Type: " FontWeight="Bold" Grid.Row="2" />
+                            <TextBlock Text="{Binding Type}" Grid.Column="1" Grid.Row="2" />
 
                         </Grid>
                     </DockPanel>
