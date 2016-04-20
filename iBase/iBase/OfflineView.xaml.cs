@@ -37,6 +37,8 @@ namespace iBase
             db.schuelers.Add(s1);
             ((klassen)(LeftListBoxName.SelectedItem)).schuelers.Add(s1);
             MiddleListBoxName.Items.Refresh();*/
+            NewItem i = new NewItem();
+            i.ShowDialog();
         }
 
         private void DeleteClick_Click(object sender, RoutedEventArgs e)
