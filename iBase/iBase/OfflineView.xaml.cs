@@ -67,11 +67,13 @@ namespace iBase
             switch (TableSelection.Text)
             {
                 case "Artist":
-                    LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
+                    LeftListBox.ItemsSource = iBase.ArtistTables.ToList();
                     break;
                 case "Album":
+                    LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
                     break;
                 case "Track":
+                    LeftListBox.ItemsSource = iBase.TrackTables.ToList();
                     break;
 
             }
