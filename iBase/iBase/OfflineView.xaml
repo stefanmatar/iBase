@@ -10,11 +10,10 @@
         Loaded="OfflineView_Loaded">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="13*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -27,8 +26,6 @@
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
         </ComboBox>
-
-        <Button Grid.Column="2" Grid.Row="0" Margin="3" Content="Search"/>
         <ListBox x:Name="LeftListBox" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="3">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -38,14 +35,9 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ListBox x:Name="MiddleListBoxName" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="3"
-                 DisplayMemberPath="S_Name">
-            <!--ItemsSource="{Binding ElementName=LeftListBoxName, Path=SelectedItem.schuelers}"-->
-        </ListBox>
-        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" Grid.Row="1" DataContext="{Binding ElementName=MiddleListBoxName, Path=SelectedItem}" Grid.RowSpan="2">
-            <TextBlock Text="{Binding Path=Artist_Name}" Margin="3"/>
-            <TextBlock Text="{Binding Path=Album_Name}" Margin="3"/>
-            <TextBlock Text="{Binding Path=Track_Name}" Margin="3"/>
+        <StackPanel x:Name="RightStackPanelName" Grid.Column="2" DataContext="{Binding ElementName=LeftListBox, Path=SelectedItem}" Grid.RowSpan="2">
+            <TextBlock Text="{Binding Path=Name}" Margin="3" Foreground="White"/>
+            <TextBlock Text="{Binding Path=Href}" Margin="3" Foreground="White"/>
             <Button x:Name="SaveClick" Content="Save" Click="SaveButtonName_Click" Margin="3"/>
             <Button x:Name="NewClick" Content="Create new" Click="NewClick_Click" Margin="3"/>
             <Button x:Name="DeleteClick" Content="Delete" Click="DeleteClick_Click" Margin="3"/>
