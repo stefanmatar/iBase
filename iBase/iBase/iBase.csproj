@@ -129,6 +129,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>iBaseDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="NewItem.xaml.cs">
+      <DependentUpon>NewItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ObjectDumper.cs" />
     <Compile Include="OfflineData.cs" />
     <Compile Include="SpotifyAPI.cs" />
@@ -166,6 +169,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="NewItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="OfflineView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

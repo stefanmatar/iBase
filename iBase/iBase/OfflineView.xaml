@@ -22,7 +22,7 @@
             <ComboBox.Resources>
                 <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#0C1419" />
             </ComboBox.Resources>
-            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" IsSelected="True" Foreground="White"/>
+            <ComboBoxItem x:Name="ComboBoxItem_Album" Content="Album" Foreground="White"/>
             <ComboBoxItem x:Name="ComboBoxItem_Artist" Content="Artist" Foreground="White"/>
             <ComboBoxItem x:Name="ComboBoxItem_Track" Content="Track" Foreground="White"/>
         </ComboBox>
@@ -36,11 +36,15 @@
             </ListBox.ItemTemplate>
         </ListBox>
         <StackPanel x:Name="RightStackPanelName" Grid.Column="2" DataContext="{Binding ElementName=LeftListBox, Path=SelectedItem}" Grid.RowSpan="2">
+            <TextBlock Text="Id:" Margin="3" Foreground="White"/>
+            <TextBlock Text="{Binding Path=Id}" Margin="3" Foreground="White"/>
+            <TextBlock Text="Name:" Margin="3" Foreground="White"/>
             <TextBlock Text="{Binding Path=Name}" Margin="3" Foreground="White"/>
+            <TextBlock Text="Link:" Margin="3" Foreground="White"/>
             <TextBlock Text="{Binding Path=Href}" Margin="3" Foreground="White"/>
-            <Button x:Name="SaveClick" Content="Save" Click="SaveButtonName_Click" Margin="3"/>
-            <Button x:Name="NewClick" Content="Create new" Click="NewClick_Click" Margin="3"/>
-            <Button x:Name="DeleteClick" Content="Delete" Click="DeleteClick_Click" Margin="3"/>
+            <Button x:Name="NewClick" Content="Create Artist" Click="New_Click" Margin="3"/>
+            <Button x:Name="DeleteClick" Content="Delete" Click="Delete_Click" Margin="3"/>
+            <Button x:Name="SaveClick" Content="Save" Click="Save_Click" Margin="3"/>
         </StackPanel>
     </Grid>
 </UserControl>

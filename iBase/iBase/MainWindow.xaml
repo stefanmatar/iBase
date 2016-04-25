@@ -19,10 +19,5 @@
             <MenuItem Header="Tracks" Click="AllTracksClick"/>
         </Menu>
         <Grid TextElement.Foreground="White" x:Name="MainWindowSpace" />
-        <!-- Effortless data binding:
-        public dynamic SomeData { get; set; }
-        SomeData.WhatEver = "Yo Man!";
-        <TextBlock Text="{Binding SomeData.WhatEver}" />
-        -->
     </DockPanel>
 </Window>

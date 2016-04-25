@@ -1,0 +1,33 @@
+﻿<Window x:Class="iBase.NewItem"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:iBase"
+        xmlns:model="clr-namespace:iBase"
+        mc:Ignorable="d"
+        Title="NewItem" Height="350" Width="300">
+    <Window.Resources>
+        <model:OfflineData x:Key="data"/>
+    </Window.Resources>
+    <StackPanel>
+        <TextBlock Text="Artist" FontSize="42" HorizontalAlignment="Center"/>
+        <!--<TextBlock Text="{Binding Id}"/>-->
+        <TextBlock Text="Name:" Margin="3"/>
+        <TextBox x:Name="itemname" Text="{Binding Name}" Margin="3"/>
+
+        <TextBlock x:Name="genrecontent" Text="Genre:" Margin="3" />
+        <TextBox Text="{Binding Path=Genre}" Margin="3"/>
+        <TextBlock Text="Type:" Margin="3" />
+        <TextBox x:Name="itemtype" Text="{Binding Path=Type}" Margin="3"/>
+        <TextBlock Text="Popularity:" Margin="3" />
+        <TextBox x:Name="itempopularity" Text="{Binding Path=Popularity}" Margin="3"/>
+        <TextBlock Text="Link:" Margin="3" />
+        <TextBox x:Name="itemhref" Text="{Binding Path=Popularity}" Margin="3"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="Save" IsDefault="True"  Content="Speichern"  Margin="4" Click="Save_Click"/>
+            <Button x:Name="Cancel" IsCancel="True"  Margin="4" Content="Abbruch"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

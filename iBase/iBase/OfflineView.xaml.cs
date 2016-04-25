@@ -24,55 +24,82 @@ namespace iBase
         {
             InitializeComponent();
         }
-        private void SaveButtonName_Click(object sender, RoutedEventArgs e)
+
+        private void New_Click(object sender, RoutedEventArgs e)
         {
-            //db.SaveChanges();
+            NewItem i = new NewItem();
+            i.ShowDialog();
+        }
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            iBase.SaveChanges();
         }
 
-        private void NewClick_Click(object sender, RoutedEventArgs e)
+        private void Delete_Click(object sender, RoutedEventArgs e)
         {
-            /*schueler s1 = new schueler();
-            s1.S_Name = "NEW";
-            s1.S_K_Klasse = ((klassen)(LeftListBoxName.SelectedItem)).K_ID;
-            db.schuelers.Add(s1);
-            ((klassen)(LeftListBoxName.SelectedItem)).schuelers.Add(s1);
-            MiddleListBoxName.Items.Refresh();*/
-        }
-
-        private void DeleteClick_Click(object sender, RoutedEventArgs e)
-        {
-            /*
-            schueler s1 = MiddleListBoxName.SelectedItem as schueler;
-            if (s1 != null)
+            string type = Sep(LeftListBox.SelectedItem.GetType().Name);
+            switch (type)
             {
-                //Would delete only the FK!
-                //((klassen)LeftListBoxName.SelectedItem).schuelers.Remove(s1);
-
-                db.schuelers.Remove(s1);
-                MiddleListBoxName.Items.Refresh();
+                case "ArtistTable":
+                    ArtistTable at = LeftListBox.SelectedItem as ArtistTable;
+                    if (at != null)
+                    {
+                        iBase.ArtistTables.Remove(at);
+                        LeftListBox.Items.Refresh();
+                        LeftListBox.ItemsSource.Re
+                    }
+                    break;
+                case "AlbumTable":
+                    AlbumTable al = LeftListBox.SelectedItem as AlbumTable;
+                    if (al != null)
+                    {
+                        iBase.AlbumTables.Remove(al);
+                        LeftListBox.Items.Refresh();
+                    }
+                    break;
+                case "TrackTable":
+                    TrackTable tb = LeftListBox.SelectedItem as TrackTable;
+                    if (tb != null)
+                    {
+                        iBase.TrackTables.Remove(tb);
+                        LeftListBox.Items.Refresh();
+                    }
+                    break;
+                default:
+                    break;
             }
-            */
         }
 
         private void OfflineView_Loaded(object sender, RoutedEventArgs e)
         {
-            LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
-            /*TO DO: Alphabetical sorting of LeftListBox*/
+            TableSelection.SelectedIndex = 0;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            switch (TableSelection.Text)
+            switch (TableSelection.SelectedValue.ToString())
             {
                 case "Artist":
-                    LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
+                    LeftListBox.ItemsSource = iBase.ArtistTables.ToList();
                     break;
                 case "Album":
+                    LeftListBox.ItemsSource = iBase.AlbumTables.ToList();
                     break;
                 case "Track":
+                    LeftListBox.ItemsSource = iBase.TrackTables.ToList();
                     break;
 
             }
+        }
+        public static string Sep(string s)
+        {
+            int l = s.IndexOf("_");
+            if (l > 0)
+            {
+                return s.Substring(0, l);
+            }
+            return "";
+
         }
     }
 

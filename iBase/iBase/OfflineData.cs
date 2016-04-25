@@ -13,6 +13,7 @@ namespace iBase {
             get {
                 return
                     (from d in db.ArtistTables
+                     orderby d.Name
                      select d).ToList();
             }
         }
@@ -20,6 +21,7 @@ namespace iBase {
             get {
                 return
                     (from d in db.AlbumTables
+                     orderby d.Name
                      select d).ToList();
             }
         }
@@ -27,6 +29,7 @@ namespace iBase {
             get {
                 return
                     (from d in db.TrackTables
+                     orderby d.Name
                      select d).ToList();
             }
         }
