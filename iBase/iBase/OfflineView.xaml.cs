@@ -46,7 +46,6 @@ namespace iBase
                     {
                         iBase.ArtistTables.Remove(at);
                         LeftListBox.Items.Refresh();
-                        LeftListBox.ItemsSource.Re
                     }
                     break;
                 case "AlbumTable":
